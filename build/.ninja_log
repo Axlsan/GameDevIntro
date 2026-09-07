@@ -1,0 +1,16 @@
+# ninja log v7
+21	50	8103930894527690	CMakeFiles/apa_game.dir/src/apa_game.cpp.obj	6b5ecc4bf4ed5ff8
+15	54	8103930894462012	CMakeFiles/apa_common.dir/src/arena.cpp.obj	55fccb5292e3f3da
+19	56	8103930894527690	CMakeFiles/apa.dir/src/arena.cpp.obj	332618956f6ac64b
+32	222	8103930894658102	CMakeFiles/apa_game.dir/src/rendering.cpp.obj	d529d562ecbe7cdf
+24	231	8103930894561546	CMakeFiles/apa_game.dir/src/game.cpp.obj	699798d7e38753e6
+12	342	8103930894462012	CMakeFiles/apa_common.dir/src/image.cpp.obj	2a43b7d7d911fd54
+26	351	8103930894595231	CMakeFiles/apa_game.dir/src/image.cpp.obj	aeca16e7fa2aa4f9
+343	366	8103930897758916	apa_common.lib	e96ac9c7f9a37505
+28	596	8103930894595231	CMakeFiles/apa_game.dir/src/main_.cpp.obj	febf63b22e79446
+40	627	8104395050768841	CMakeFiles/apa.dir/src/main.cpp.obj	1ea5dddb12d50dce
+597	770	8103930901862115	apa_game.dll	515f036aa0d8fd15
+597	770	8103930901862115	apa_game.lib	515f036aa0d8fd15
+628	770	8104395056650399	apa.exe	483b58e08a76904e
+26	631	8104397118949149	CMakeFiles/apa.dir/src/main.cpp.obj	1ea5dddb12d50dce
+632	784	8104397125031093	apa.exe	483b58e08a76904e
