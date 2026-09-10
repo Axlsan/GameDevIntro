@@ -14,3 +14,10 @@ void* Memory::Allocate(Arena *arena, size_t size) {
 void Memory::Reset(Arena *arena){
   arena->used = 0;
 }
+
+Memory::Arena* Memory::CreateSubArena(Arena* parentArena, size_t size){
+  Memory::Arena* subArena = (Memory::Arena*)Allocate(parentArena, sizeof(Memory::Arena));
+  void* memoryStart = Allocate(parentArena, size);
+  Memory::Initialize(subArena, memoryStart, size);
+  return subArena;
+}

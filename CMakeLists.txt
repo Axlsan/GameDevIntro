@@ -13,7 +13,6 @@ set(WINDOWS_LIBRARIES winmm)
 # Flag .EXE specific files
 set(EXE_EXCLUSIVE
     ${CMAKE_SOURCE_DIR}/src/main.cpp
-    ${CMAKE_SOURCE_DIR}/src/arena.cpp
 )
 
 # Flag files that both our .EXE and .DLL need to know about
@@ -53,13 +52,12 @@ if(DLL_EXCLUSIVE)
     target_include_directories(${DLL_NAME} PRIVATE include)
     target_link_libraries(${DLL_NAME} PRIVATE 
         ${LIB_FILES}
-        #${WINDOWS_LIBRARIES}
         ${SHARED_LIB_NAME}
     )
 endif()
 
 # Copy DLLs
-file(GLOB_RECURSE DLL_FILES "${CMAKE_SOURCE_DIR}/lib/*.dll")
+#file(GLOB_RECURSE DLL_FILES "${CMAKE_SOURCE_DIR}/lib/*.dll")
 if(DLL_FILES)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_if_different

@@ -1,3 +1,4 @@
+#include <sdkddkver.h>
 #include <windows.h>
 #include <cstddef>
 #include <timeapi.h>
@@ -13,6 +14,7 @@
 #include "common.h"
 #include "arena.h"
 #include "gameState.h"
+#include "levels.h"
 
 SDL_Window* window;
 SDL_Renderer* renderer;
@@ -23,7 +25,7 @@ Uint64 PREV = 0;
 constexpr const char* NAME_OF_DLL = "apa_game.dll";
 constexpr const char* NAME_OF_TEMP_DLL = "apa_temp.dll";
 
-typedef void (*Function_Initialize) (GameData* data);
+typedef void (*Function_Initialize) (GameData* data, SDL_Renderer* renderer);
 typedef bool (*Function_HandleEvents) (GameData* data, SDL_Event event);
 typedef void (*Function_Update) (GameData* data, float dt);
 typedef void (*Function_Draw) (GameData* data, SDL_Renderer* renderer);
@@ -103,7 +105,7 @@ void* AllocateGameMemory(){
 
 void SDL_Setup(){
   SDL_Init(SDL_INIT_EVENTS);
-  window = SDL_CreateWindow("pilot", 650, 400, 0);
+  window = SDL_CreateWindow("pilot", SCREEN_WIDTH, SCREEN_HEIGHT, 0);
   renderer = SDL_CreateRenderer(window, NULL);
 }
 
@@ -149,27 +151,26 @@ int main() {
   }
 
   // Memory allocation
-  Memory::Arena* arena = new Memory::Arena();
-  Memory::Initialize(arena, game_memory, GAME_MEMORY_ALLOWANCE);
-  GameData* gameData = (GameData*)Memory::Allocate(arena, sizeof(GameData));
+  Memory::Arena* arenaMain = new Memory::Arena();
+  Memory::Initialize(arenaMain, game_memory, GAME_MEMORY_ALLOWANCE);
+  GameData* gameData = (GameData*)Memory::Allocate(arenaMain, sizeof(GameData));
 
 
   size_t IMAGE_ARENA_SIZE = sizeof(Image) * 1024;
 
-/*
-  Memory::Arena* arena_image = new Memory::Arena();
-  Memory::Initialize(arena_image, game_memory, IMAGE_ARENA_SIZE);
-  gameData = (GameData*)Memory::Allocate(arena_image, sizeof(GameData));
-  */
-  Memory::Arena* arena_image = (Memory::Arena*)Memory::Allocate(arena,sizeof(Memory::Arena));
+  gameData->arenaImages = Memory::CreateSubArena(arenaMain, IMAGE_ARENA_SIZE);
+  gameData->arenaLevels = Memory::CreateSubArena(arenaMain, MEGABYTES(3));
+  gameData->arenaEntities = Memory::CreateSubArena(gameData->arenaLevels, MEGABYTES(1));
 
-  void* image_memory_start = Memory::Allocate(arena, IMAGE_ARENA_SIZE);
-  Memory::Initialize(arena_image, image_memory_start, IMAGE_ARENA_SIZE);
+  // Allocate the pointer (array) of levels
+  gameData->levels = (LevelData*)Memory::Allocate(gameData->arenaLevels, sizeof(LevelData));
+
 
 
   SDL_Setup();
-  gameData->fallback = AssetManagement::LoadSprite(
-    +arena_image, renderer, "dog.png");
+
+
+  gameData->fallback = AssetManagement::LoadSprite(gameData->arenaImages, renderer, "dog.png");
   if(gameData->fallback == nullptr){
     return 1;
   }
@@ -182,7 +183,7 @@ int main() {
     return 3;
   }
 
-
+  printf("exe sizeof(GameData) = %zu\n", sizeof(GameData));
   DLL_INFO dll;
   bool dll_successfully_loaded = LoadDLL(&dll);
 
@@ -190,7 +191,7 @@ int main() {
     return 2;
   }
 
-  dll.initialize(gameData);
+  dll.initialize(gameData, renderer);
   bool running = true;
   float dt;
 
@@ -208,8 +209,8 @@ int main() {
 
       // Save & Load keys
       if(event.type == SDL_EVENT_KEY_DOWN){
-        if(event.key.key == SDLK_F9) StoreGameState(arena);
-        if(event.key.key == SDLK_F10) RetrieveGameState(arena);
+        if(event.key.key == SDLK_F9) StoreGameState(arenaMain);
+        if(event.key.key == SDLK_F10) RetrieveGameState(arenaMain);
       }
     }
     dll.update(gameData, dt);

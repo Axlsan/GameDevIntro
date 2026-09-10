@@ -1,13 +1,18 @@
 #include "game.h"
+#include "levelRenderer.h"
 #include <cstddef>
+#include <cstdio>
 
 extern "C" {
-  void Initialize(GameData* data){
-    data->rect.x = 100;
-    data->rect.y = 100;
-    data->rect.h = 50;
-    data->rect.w = 50;
-    data->move_speed = 100;
+  void Initialize(GameData* data, SDL_Renderer* renderer){
+    printf("dll sizeof(GameData) = %zu\n", sizeof(GameData));
+    data->ground = AssetManagement::LoadSprite(data->arenaImages, renderer, "ground.png");
+    data->wall = AssetManagement::LoadSprite(data->arenaImages, renderer, "wall.png");
+    data->player = AssetManagement::LoadSprite(data->arenaImages, renderer, "player.png");
+
+    data->currentLevel = 0;
+    CreateLevel(data->arenaLevels, &data->levels[0], "assets/levels/map.tmj");
+    CreateEntities(&data->levels[data->currentLevel], data->arenaEntities);
   }
 
   bool HandleEvents(GameData *data, SDL_Event event){
@@ -23,29 +28,30 @@ extern "C" {
   
   void Update(GameData* data,float dt){
     const bool* keys = SDL_GetKeyboardState(NULL);
-
+/*
     if(keys[SDL_SCANCODE_RIGHT]){
-      data->rect.x += data->move_speed * dt;
+      data->rect.x += data->moveSpeed * dt;
     }
 
     if(keys[SDL_SCANCODE_LEFT]){
-      data->rect.x -= data->move_speed * dt;
+      data->rect.x -= data->moveSpeed * dt;
     }
 
     if(keys[SDL_SCANCODE_UP]){
-      data->rect.y -= data->move_speed * dt;
+      data->rect.y -= data->moveSpeed * dt;
       }
   
     if(keys[SDL_SCANCODE_DOWN]){
-      data->rect.y += data->move_speed * dt;
-    }
+      data->rect.y += data->moveSpeed * dt;
+    }*/
   }
   void Draw(GameData* data, SDL_Renderer* renderer){
     SDL_SetRenderDrawColor(renderer, 80, 50, 80, 255);
     SDL_RenderClear(renderer);
 
-    SDL_RenderTexture(renderer, data->fallback->texture, NULL, &data->rect);
-
+    RenderLevel(data, renderer);
+    RenderEntities(data, renderer);
+    
     SDL_RenderPresent(renderer);
   }
 
