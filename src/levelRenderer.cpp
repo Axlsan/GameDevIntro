@@ -18,6 +18,8 @@ void RenderLevel(GameData* gameData, SDL_Renderer* renderer){
 
       Image* sprite;
       switch (cellType) {
+        case 0:
+          continue;
         case 4:
           sprite = gameData->ground;
           break;

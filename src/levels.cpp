@@ -46,10 +46,13 @@ void CreateEntities(LevelData* lvlData, Arena* arena){
 
   lvlData->entityBuffer = (Entity*)Memory::Allocate(arena, sizeof(Entity) * lvlData->entityCount);
   int index = 0;
-  for(int i = 0; i < lvlData->w; i++){
+  for(int i = 0; i < lvlData->w * lvlData->h; i++){
     unsigned char entityID = entityData[i];
     if(entityID != 0){
       lvlData->entityBuffer[index].id = entityID;
+      lvlData->entityBuffer[index].x = i % lvlData->w;
+      lvlData->entityBuffer[index].y = i / lvlData->w;
+      index++;
     }
   }
 }
