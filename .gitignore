@@ -30,6 +30,8 @@
 *.exe
 *.out
 *.app
-/.vs
-/build
-/.vs
+.vs/
+build/
+.cache/
+temp_state.bin
+
