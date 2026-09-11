@@ -166,6 +166,7 @@ int main() {
   gameData->levels = (LevelData*)Memory::Allocate(gameData->arenaLevels, sizeof(LevelData));
 
 
+  gameData->keysPrevious = (bool*)Memory::Allocate(gameData->arenaLevels, sizeof(bool) * SDL_SCANCODE_COUNT);
 
   SDL_Setup();
 

@@ -37,13 +37,14 @@ void CreateEntities(LevelData* lvlData, Arena* arena){
   auto result = nlohmann::json::parse(stream);
   auto entityData = result["layers"][ENTITIES_INDEX]["data"].get<vector<uint8_t>>();
 
+/*
   for(int i = 0; i < lvlData->w * lvlData->h; i++){
     unsigned char entityID = entityData[i];
     if(entityID != 0){
       lvlData->entityCount++;
     }
   }
-
+*/
   
   // En schwanky lösning
   lvlData->entityBuffer = (Entity*)Memory::Allocate(arena, sizeof(Entity) * lvlData->entityCount);
@@ -51,10 +52,15 @@ void CreateEntities(LevelData* lvlData, Arena* arena){
   for(int i = 0; i < lvlData->w * lvlData->h; i++){
     unsigned char entityID = entityData[i];
     if(entityID != 0){
-      lvlData->entityBuffer[index].id = entityID;
+      lvlData->entityCount++;
+
+      
+      lvlData->entityBuffer[index].id = (ID)entityID;
+      lvlData->entityBuffer[index].InitializeBaseBehaviour();
       lvlData->entityBuffer[index].x = i % lvlData->w;
       lvlData->entityBuffer[index].y = i / lvlData->w;
       index++;
+
     }
   }
 }

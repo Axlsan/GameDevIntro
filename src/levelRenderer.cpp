@@ -3,11 +3,12 @@
 
 #include "levelRenderer.h"
 #include "common.h"
+#include "entity.h"
 #include "rendering.h"
 
 void RenderLevel(GameData* gameData, SDL_Renderer* renderer){
 
-  LevelData lvl = gameData->levels[gameData->currentLevel];
+  LevelData lvl = gameData->levels[gameData->currentLevelIndex];
 
   int boardWidthPxHalf = lvl.w * CELL_SIZE_PX / 2;
   int boardHeightPxHalf = lvl.h * CELL_SIZE_PX / 2;
@@ -46,12 +47,12 @@ void RenderLevel(GameData* gameData, SDL_Renderer* renderer){
 }
 
 void RenderEntities(GameData* data, SDL_Renderer* renderer){
-  LevelData lvlData = data->levels[data->currentLevel];
+  LevelData lvlData = data->levels[data->currentLevelIndex];
   for(int i = 0; i < lvlData.entityCount; i++){
     Image* img;
     Entity entity = lvlData.entityBuffer[i];
     switch(entity.id){
-      case 6:
+      case ID::PLAYER:
         img = data->player;
         break;
       default:
@@ -65,8 +66,8 @@ void RenderEntities(GameData* data, SDL_Renderer* renderer){
     xPos += SCREEN_WIDTH / 2;
     yPos += SCREEN_HEIGHT / 2;
 
-    xPos -= data->levels[data->currentLevel].w * CELL_SIZE_PX / 2;
-    yPos -= data->levels[data->currentLevel].h * CELL_SIZE_PX / 2;
+    xPos -= data->levels[data->currentLevelIndex].w * CELL_SIZE_PX / 2;
+    yPos -= data->levels[data->currentLevelIndex].h * CELL_SIZE_PX / 2;
 
     xPos += entity.x * CELL_SIZE_PX;
     yPos += entity.y * CELL_SIZE_PX;

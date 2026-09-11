@@ -12,10 +12,18 @@ struct GameData {
   Memory::Arena* arenaLevels;
   Memory::Arena* arenaEntities;
   Memory::Arena* arenaImages;
+
   LevelData* levels;
   int levelCount;
-  int currentLevel;
+  int currentLevelIndex;
 
   float moveSpeed;
+
+  bool* keysPrevious;
+
+  LevelData* GetCurrentLevel(){
+    return &levels[currentLevelIndex];
+  }
+  
 };
 
