@@ -44,6 +44,8 @@ void CreateEntities(LevelData* lvlData, Arena* arena){
     }
   }
 
+  
+  // En schwanky lösning
   lvlData->entityBuffer = (Entity*)Memory::Allocate(arena, sizeof(Entity) * lvlData->entityCount);
   int index = 0;
   for(int i = 0; i < lvlData->w * lvlData->h; i++){
