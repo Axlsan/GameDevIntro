@@ -41,7 +41,7 @@ void RenderLevel(GameData* gameData, SDL_Renderer* renderer){
       xPos -= boardWidthPxHalf;
       yPos -= boardHeightPxHalf;
 
-      RenderSprite(sprite, renderer, xPos, yPos);
+      RenderSprite(sprite, renderer, xPos, yPos, UPSCALE_FACTOR);
     }
   }
 }
@@ -72,6 +72,6 @@ void RenderEntities(GameData* data, SDL_Renderer* renderer){
     xPos += entity.x * CELL_SIZE_PX;
     yPos += entity.y * CELL_SIZE_PX;
 
-    RenderSprite(img, renderer, xPos, yPos);
+    RenderSprite(img, renderer, xPos, yPos, UPSCALE_FACTOR);
   }
 }
