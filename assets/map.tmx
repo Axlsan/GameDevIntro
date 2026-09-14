@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
+ <editorsettings>
+  <export target="levels/map.tmj" format="json"/>
+ </editorsettings>
  <tileset firstgid="1" source="base.tsx"/>
  <layer id="1" name="level" width="10" height="10">
   <data encoding="csv">
@@ -19,10 +22,10 @@
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,
+0,0,7,7,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,6,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,6,0,7,7,0,0,
+0,0,0,0,0,0,7,0,0,0,
 0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,

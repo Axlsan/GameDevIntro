@@ -8,13 +8,16 @@
 
 extern "C" {
   void Initialize(GameData* data, SDL_Renderer* renderer){
-    printf("dll sizeof(GameData) = %zu\n", sizeof(GameData));
+//    printf("dll sizeof(GameData) = %zu\n", sizeof(GameData));
+    
     data->ground = AssetManagement::LoadSprite(data->arenaImages, renderer, "ground.png");
     data->wall = AssetManagement::LoadSprite(data->arenaImages, renderer, "wall.png");
     data->player = AssetManagement::LoadSprite(data->arenaImages, renderer, "player.png");
+    data->box = AssetManagement::LoadSprite(data->arenaImages, renderer, "box.png");
 
-    data->currentLevelIndex = 0;
+    data->currentLevelIndex = 1;
     CreateLevel(data->arenaLevels, &data->levels[0], "assets/levels/map.tmj");
+    CreateLevel(data->arenaLevels, &data->levels[1], "assets/levels/map_box.tmj");
     CreateEntities(&data->levels[data->currentLevelIndex], data->arenaEntities);
   }
 
@@ -49,6 +52,35 @@ extern "C" {
     }
     return !current[key] && previous[key];
   }
+
+  bool TryMove(Entity *mover, LevelData *level, int xDir, int yDir){
+    if(mover->HasBehaviour(CAN_MOVE) == false){
+      return false;
+    }
+
+    int testX = mover->x + xDir;
+    int testY = mover->y + yDir;
+    Entity* stepIntoEntity = level->GetEntity(testX, testY);
+    ID stepIntoTileID = (ID)level->getCellID(testX, testY);
+
+    if(stepIntoEntity == nullptr){
+      if(stepIntoTileID == ID::GROUND){
+        mover->x = testX;
+        mover->y = testY;
+        return true;
+      }
+      return false;
+    }
+    
+    if(stepIntoEntity->HasBehaviour(CAN_MOVE)){
+      if(TryMove(stepIntoEntity, level, xDir, yDir)){
+        mover->x = testX;
+        mover->y = testY;
+        return true;
+      }
+    }
+    return false;
+  }
   
   void Update(GameData* data,float dt){
 //    const bool* keys = SDL_GetKeyboardState(NULL);
@@ -78,6 +110,12 @@ extern "C" {
           yChange = 1;
         }
 
+        if(xChange != 0 || yChange != 0){
+          TryMove(entity, data->GetCurrentLevel(), xChange, yChange);
+        }
+
+        
+/*
         if(xChange != 0|| yChange !=0){
           int stepIntoX = entity->x + xChange;
           int stepIntoY = entity->y + yChange;
@@ -92,25 +130,9 @@ extern "C" {
             }
           }
         }
-
+        */
       }
     }
-/*
-    if(keys[SDL_SCANCODE_RIGHT]){
-      data->rect.x += data->moveSpeed * dt;
-    }
-
-    if(keys[SDL_SCANCODE_LEFT]){
-      data->rect.x -= data->moveSpeed * dt;
-    }
-
-    if(keys[SDL_SCANCODE_UP]){
-      data->rect.y -= data->moveSpeed * dt;
-      }
-  
-    if(keys[SDL_SCANCODE_DOWN]){
-      data->rect.y += data->moveSpeed * dt;
-    }*/
 
     // copy keys to keysPrevious
     memcpy((void*)data->keysPrevious, keys, SDL_SCANCODE_COUNT * sizeof(bool));

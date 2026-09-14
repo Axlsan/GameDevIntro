@@ -163,7 +163,8 @@ int main() {
   gameData->arenaEntities = Memory::CreateSubArena(gameData->arenaLevels, MEGABYTES(1));
 
   // Allocate the pointer (array) of levels
-  gameData->levels = (LevelData*)Memory::Allocate(gameData->arenaLevels, sizeof(LevelData));
+  gameData->levelCount = 2; 
+  gameData->levels = (LevelData*)Memory::Allocate(gameData->arenaLevels, sizeof(LevelData) * gameData->levelCount);
 
 
   gameData->keysPrevious = (bool*)Memory::Allocate(gameData->arenaLevels, sizeof(bool) * SDL_SCANCODE_COUNT);
@@ -184,7 +185,6 @@ int main() {
     return 3;
   }
 
-  printf("exe sizeof(GameData) = %zu\n", sizeof(GameData));
   DLL_INFO dll;
   bool dll_successfully_loaded = LoadDLL(&dll);
 
