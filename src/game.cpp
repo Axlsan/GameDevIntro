@@ -1,6 +1,7 @@
 #include "game.h"
 #include "SDL3/SDL_keyboard.h"
 #include "SDL3/SDL_scancode.h"
+#include "command.h"
 #include "entity.h"
 #include "levelRenderer.h"
 #include <cstddef>
@@ -53,29 +54,38 @@ extern "C" {
     return !current[key] && previous[key];
   }
 
-  bool TryMove(Entity *mover, LevelData *level, int xDir, int yDir){
+  bool TryMove(Entity *mover, LevelData *level, CommandBuffer* cmdBuffer, int xDir, int yDir){
     if(mover->HasBehaviour(CAN_MOVE) == false){
       return false;
     }
 
     int testX = mover->x + xDir;
     int testY = mover->y + yDir;
+    
     Entity* stepIntoEntity = level->GetEntity(testX, testY);
     ID stepIntoTileID = (ID)level->getCellID(testX, testY);
 
     if(stepIntoEntity == nullptr){
       if(stepIntoTileID == ID::GROUND){
-        mover->x = testX;
-        mover->y = testY;
+        MoveCommand mv;
+        mv.type = CMD_TYPE::MOVE;
+        mv.entity = mover;
+        mv.xDir = xDir;
+        mv.yDir = yDir;
+        Push(cmdBuffer, mv);
         return true;
       }
       return false;
     }
     
     if(stepIntoEntity->HasBehaviour(CAN_MOVE)){
-      if(TryMove(stepIntoEntity, level, xDir, yDir)){
-        mover->x = testX;
-        mover->y = testY;
+      if(TryMove(stepIntoEntity, level, cmdBuffer, xDir, yDir)){
+        MoveCommand mv;
+        mv.type = CMD_TYPE::MOVE;
+        mv.entity = mover;
+        mv.xDir = xDir;
+        mv.yDir = yDir;
+        Push(cmdBuffer, mv);
         return true;
       }
     }
@@ -110,8 +120,18 @@ extern "C" {
           yChange = 1;
         }
 
+        // UNDO/REDO
+        if(KeyPressed(SDL_SCANCODE_Z, keys, data->keysPrevious)){
+          if(KeyHeld(SDL_SCANCODE_LSHIFT, keys, data->keysPrevious)){
+            Redo(data->commandBuffer);
+          }
+          else{
+            Undo(data->commandBuffer);
+          }
+        }
+
         if(xChange != 0 || yChange != 0){
-          TryMove(entity, data->GetCurrentLevel(), xChange, yChange);
+          TryMove(entity, data->GetCurrentLevel(), data->commandBuffer, xChange, yChange);
         }
 
         

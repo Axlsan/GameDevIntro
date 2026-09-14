@@ -11,6 +11,7 @@
 #include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_render.h"
 #include "SDL3/SDL_timer.h"
+#include "command.h"
 #include "common.h"
 #include "arena.h"
 #include "gameState.h"
@@ -156,12 +157,14 @@ int main() {
   GameData* gameData = (GameData*)Memory::Allocate(arenaMain, sizeof(GameData));
 
 
-  size_t IMAGE_ARENA_SIZE = sizeof(Image) * 1024;
+  size_t IMAGE_ARENA_SIZE = sizeof(Image) * 100;
 
   gameData->arenaImages = Memory::CreateSubArena(arenaMain, IMAGE_ARENA_SIZE);
   gameData->arenaLevels = Memory::CreateSubArena(arenaMain, MEGABYTES(3));
   gameData->arenaEntities = Memory::CreateSubArena(gameData->arenaLevels, MEGABYTES(1));
 
+  gameData->arenaCommands =Memory::CreateSubArena(gameData->arenaLevels, MEGABYTES(1));
+  
   // Allocate the pointer (array) of levels
   gameData->levelCount = 2; 
   gameData->levels = (LevelData*)Memory::Allocate(gameData->arenaLevels, sizeof(LevelData) * gameData->levelCount);
@@ -169,6 +172,12 @@ int main() {
 
   gameData->keysPrevious = (bool*)Memory::Allocate(gameData->arenaLevels, sizeof(bool) * SDL_SCANCODE_COUNT);
 
+  //Commandbuffer
+  gameData->commandBuffer = (CommandBuffer*)Memory::Allocate(gameData->arenaLevels, sizeof(CommandBuffer));
+  gameData->commandBuffer->capacity = 2000;
+  size_t COMMAND_SIZE = sizeof(AnyCommand) * gameData->commandBuffer->capacity;
+  gameData->commandBuffer->allCommands = (AnyCommand*)Memory::Allocate(gameData->arenaCommands, COMMAND_SIZE);
+  
   SDL_Setup();
 
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "SDL3/SDL_rect.h"
 #include "arena.h"
+#include "command.h"
 #include "image.h"
 #include "levels.h"
 
@@ -26,5 +27,7 @@ struct GameData {
     return &levels[currentLevelIndex];
   }
   
+  Memory::Arena* arenaCommands;
+  CommandBuffer* commandBuffer;
 };
 
