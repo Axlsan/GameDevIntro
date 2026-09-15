@@ -4,6 +4,7 @@
 #include "command.h"
 #include "dev_gui.h"
 #include "entity.h"
+#include "gameState.h"
 #include "imgui/imgui_impl_sdlrenderer3.h"
 #include "levelRenderer.h"
 #include "imgui/imgui.h"
@@ -61,7 +62,7 @@ extern "C" {
     return !current[key] && previous[key];
   }
 
-  bool TryMove(Entity *mover, LevelData *level, CommandBuffer* cmdBuffer, int xDir, int yDir){
+  bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmdBuffer, int xDir, int yDir, int timestamp){
     if(mover->HasBehaviour(CAN_MOVE) == false){
       return false;
     }
@@ -79,20 +80,20 @@ extern "C" {
         mv.entity = mover;
         mv.xDir = xDir;
         mv.yDir = yDir;
-        Push(cmdBuffer, mv);
+        Push(cmdBuffer, mv, timestamp);
         return true;
       }
       return false;
     }
     
     if(stepIntoEntity->HasBehaviour(CAN_MOVE)){
-      if(TryMove(stepIntoEntity, level, cmdBuffer, xDir, yDir)){
+      if(TryMove(stepIntoEntity, level, cmdBuffer, xDir, yDir, timestamp)){
         MoveCommand mv;
         mv.type = CMD_TYPE::MOVE;
         mv.entity = mover;
         mv.xDir = xDir;
         mv.yDir = yDir;
-        Push(cmdBuffer, mv);
+        Push(cmdBuffer, mv, timestamp);
         return true;
       }
     }
@@ -103,6 +104,19 @@ extern "C" {
 //    const bool* keys = SDL_GetKeyboardState(NULL);
 
     const bool* keys = SDL_GetKeyboardState(nullptr);
+    
+
+    // UNDO/REDO
+    if(KeyPressed(SDL_SCANCODE_Z, keys, data->keysPrevious)){
+      if(KeyHeld(SDL_SCANCODE_LSHIFT, keys, data->keysPrevious)){
+        Redo(data->commandBuffer);
+      }
+      else{
+        Undo(data->commandBuffer);
+      }
+    }
+
+    data->commandTimestamp++;
     
     for(int i = 0; i < data->GetCurrentLevel()->entityCount; i++){
       Entity* entity = &data->GetCurrentLevel()->entityBuffer[i];
@@ -127,37 +141,15 @@ extern "C" {
           yChange = 1;
         }
 
-        // UNDO/REDO
-        if(KeyPressed(SDL_SCANCODE_Z, keys, data->keysPrevious)){
-          if(KeyHeld(SDL_SCANCODE_LSHIFT, keys, data->keysPrevious)){
-            Redo(data->commandBuffer);
-          }
-          else{
-            Undo(data->commandBuffer);
-          }
-        }
 
-        if(xChange != 0 || yChange != 0){
-          TryMove(entity, data->GetCurrentLevel(), data->commandBuffer, xChange, yChange);
-        }
 
         
-/*
-        if(xChange != 0|| yChange !=0){
-          int stepIntoX = entity->x + xChange;
-          int stepIntoY = entity->y + yChange;
-          
-          Entity* stepIntoEntity = data->GetCurrentLevel()->GetEntity(stepIntoX, stepIntoY);
-          uint8_t stepIntoTileID = data->GetCurrentLevel()->getCellID(stepIntoX, stepIntoY);
-
-          if(stepIntoEntity == nullptr){
-            if(stepIntoTileID == (uint8_t)ID::GROUND){
-              entity->x = stepIntoX;
-              entity->y = stepIntoY;
-            }
-          }
+        if(xChange != 0 || yChange != 0){
+          TryMove(entity, data->GetCurrentLevel(), data->commandBuffer, xChange, yChange, data->commandTimestamp);
+        
         }
-        */
+
+
       }
     }
 
@@ -166,23 +158,6 @@ extern "C" {
   }
   void Draw(GameData* data, SDL_Renderer* renderer){
     
-    /*ImGui::Begin("Dev Tools");
-    ImGui::Text("memory arena usage");
-    */
-   /* DrawImGuiArenaUsage(data->arenaImages, "images");
-    DrawImGuiArenaUsage(data->arenaLevels, "levels");
-    DrawImGuiArenaUsage(data->arenaCommands, "commands");
-    DrawImGuiArenaUsage(data->arenaEntities, "entities");
-
-    DrawHistory(data->commandBuffer);
-
-    DrawFPS(*data->dt);
-
-    ImGui::End();
-
-    ImGui::Render();
-    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
-    */
     
     SDL_SetRenderDrawColor(renderer, 80, 50, 80, 255);
     SDL_RenderClear(renderer);
