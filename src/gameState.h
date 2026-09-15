@@ -3,6 +3,8 @@
 #include "arena.h"
 #include "command.h"
 #include "image.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
 #include "levels.h"
 
 struct GameData {
@@ -23,6 +25,10 @@ struct GameData {
 
   bool* keysPrevious;
 
+  const float* dt;
+
+  ImGuiContext* ImGUIContext;
+  
   LevelData* GetCurrentLevel(){
     return &levels[currentLevelIndex];
   }

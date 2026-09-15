@@ -26,7 +26,7 @@ Uint64 PREV = 0;
 constexpr const char* NAME_OF_DLL = "apa_game.dll";
 constexpr const char* NAME_OF_TEMP_DLL = "apa_temp.dll";
 
-typedef void (*Function_Initialize) (GameData* data, SDL_Renderer* renderer);
+typedef void (*Function_Initialize) (GameData* data, SDL_Window* window, SDL_Renderer* renderer);
 typedef bool (*Function_HandleEvents) (GameData* data, SDL_Event event);
 typedef void (*Function_Update) (GameData* data, float dt);
 typedef void (*Function_Draw) (GameData* data, SDL_Renderer* renderer);
@@ -201,10 +201,11 @@ int main() {
     return 2;
   }
 
-  dll.initialize(gameData, renderer);
+  dll.initialize(gameData, window, renderer);
   bool running = true;
   float dt;
 
+  gameData->dt = &dt;
 
   while(running){
     DLL_CheckStatus(&dll);

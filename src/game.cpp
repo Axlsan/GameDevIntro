@@ -2,14 +2,19 @@
 #include "SDL3/SDL_keyboard.h"
 #include "SDL3/SDL_scancode.h"
 #include "command.h"
+#include "dev_gui.h"
 #include "entity.h"
+#include "imgui/imgui_impl_sdlrenderer3.h"
 #include "levelRenderer.h"
+#include "imgui/imgui.h"
 #include <cstddef>
 #include <cstdio>
 
 extern "C" {
-  void Initialize(GameData* data, SDL_Renderer* renderer){
+  void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer){
 //    printf("dll sizeof(GameData) = %zu\n", sizeof(GameData));
+    DEV::Initialize(window, renderer);
+    data->ImGUIContext = ImGui::GetCurrentContext();
     
     data->ground = AssetManagement::LoadSprite(data->arenaImages, renderer, "ground.png");
     data->wall = AssetManagement::LoadSprite(data->arenaImages, renderer, "wall.png");
@@ -23,6 +28,8 @@ extern "C" {
   }
 
   bool HandleEvents(GameData *data, SDL_Event event){
+    DEV::ProcessEvents(&event);
+    
     if(event.type != SDL_EVENT_KEY_DOWN){
       return true;
     }
@@ -158,12 +165,34 @@ extern "C" {
     memcpy((void*)data->keysPrevious, keys, SDL_SCANCODE_COUNT * sizeof(bool));
   }
   void Draw(GameData* data, SDL_Renderer* renderer){
+    
+    /*ImGui::Begin("Dev Tools");
+    ImGui::Text("memory arena usage");
+    */
+   /* DrawImGuiArenaUsage(data->arenaImages, "images");
+    DrawImGuiArenaUsage(data->arenaLevels, "levels");
+    DrawImGuiArenaUsage(data->arenaCommands, "commands");
+    DrawImGuiArenaUsage(data->arenaEntities, "entities");
+
+    DrawHistory(data->commandBuffer);
+
+    DrawFPS(*data->dt);
+
+    ImGui::End();
+
+    ImGui::Render();
+    ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
+    */
+    
     SDL_SetRenderDrawColor(renderer, 80, 50, 80, 255);
     SDL_RenderClear(renderer);
 
     RenderLevel(data, renderer);
     RenderEntities(data, renderer);
-    
+
+
+    DEV::PreDraw(data->ImGUIContext);
+    DEV::Draw(data, renderer);
     SDL_RenderPresent(renderer);
   }
 

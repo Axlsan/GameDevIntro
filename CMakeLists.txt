@@ -9,6 +9,16 @@ set(DIR_ASSETS_DESTINATION $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets)
 
 set(WINDOWS_LIBRARIES winmm)
 
+# Flag imgui cpp files
+set(IMGUI
+    src_external/imgui/imgui.cpp
+    src_external/imgui/imgui_draw.cpp
+    src_external/imgui/imgui_tables.cpp
+    src_external/imgui/imgui_widgets.cpp
+    src_external/imgui/imgui_impl_sdlrenderer3.cpp
+    src_external/imgui/imgui_impl_sdl3.cpp
+)
+
 
 # Flag .EXE specific files
 set(EXE_EXCLUSIVE
@@ -35,7 +45,10 @@ file(GLOB_RECURSE DLL_EXCLUSIVE "src/*.cpp")
 list(REMOVE_ITEM DLL_EXCLUSIVE ${EXE_EXCLUSIVE})
 
 # EXE
-add_executable(${PROJECT_NAME} ${EXE_EXCLUSIVE})
+add_executable(${PROJECT_NAME} ${EXE_EXCLUSIVE} ${IMGUI})
+target_include_directories(${PROJECT_NAME} PRIVATE include src_external)
+#imgui
+
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 if(LIB_FILES)
     target_link_libraries(${PROJECT_NAME} PRIVATE   
@@ -47,7 +60,7 @@ endif()
 
 # GAME DLL
 if(DLL_EXCLUSIVE)
-    add_library(${DLL_NAME} SHARED ${DLL_EXCLUSIVE})
+    add_library(${DLL_NAME} SHARED ${DLL_EXCLUSIVE} ${IMGUI})
 
     target_include_directories(${DLL_NAME} PRIVATE include)
     target_link_libraries(${DLL_NAME} PRIVATE 
@@ -65,6 +78,8 @@ if(DLL_FILES)
         "$<TARGET_FILE_DIR:${PROJECT_NAME}>"
         COMMAND_EXPAND_LISTS
     )
+    target_include_directories(${DLL_NAME} PRIVATE include src_external)
+    
 endif()
 
 # allra sist
