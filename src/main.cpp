@@ -178,6 +178,12 @@ int main() {
   size_t COMMAND_SIZE = sizeof(AnyCommand) * gameData->commandBuffer->capacity;
   gameData->commandBuffer->allCommands = (AnyCommand*)Memory::Allocate(gameData->arenaCommands, COMMAND_SIZE);
   
+  // Ringbuffer
+  gameData->inputBufferCapacity = 50;
+  size_t RING_BUFFER_SIZE = sizeof(Position) * gameData->inputBufferCapacity;
+  gameData->inputBuffer = (Position*)Memory::Allocate(gameData->arenaLevels, RING_BUFFER_SIZE);
+
+  
   SDL_Setup();
 
 
@@ -226,6 +232,9 @@ int main() {
     }
     dll.update(gameData, dt);
     dll.draw(gameData, renderer);
+
+    // copy keys to keysPrevious
+    memcpy((void*)gameData->keysPrevious, SDL_GetKeyboardState(nullptr), SDL_SCANCODE_COUNT * sizeof(bool));
 
     double time_to_sleep_ms;
     CalculateRemainingFrameTime_MS(&time_to_sleep_ms);

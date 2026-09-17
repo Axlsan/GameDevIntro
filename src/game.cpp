@@ -1,4 +1,5 @@
 #include "game.h"
+#include "common.h"
 #include "SDL3/SDL_keyboard.h"
 #include "SDL3/SDL_scancode.h"
 #include "command.h"
@@ -116,6 +117,60 @@ extern "C" {
       }
     }
 
+    if(KeyPressed(SDL_SCANCODE_RIGHT, keys, data->keysPrevious)){
+      data->inputBuffer[data->inputBufferWriteCount++ % data->inputBufferCapacity] =
+        {1,0};
+    }
+    
+    else if(KeyPressed(SDL_SCANCODE_LEFT, keys, data->keysPrevious)){
+      data->inputBuffer[data->inputBufferWriteCount++ % data->inputBufferCapacity] =
+        {-1,0};
+    }
+
+    else if(KeyPressed(SDL_SCANCODE_UP, keys, data->keysPrevious)){
+      data->inputBuffer[data->inputBufferWriteCount++ % data->inputBufferCapacity] =
+        {0,-1};
+    }
+
+    else if(KeyPressed(SDL_SCANCODE_DOWN, keys, data->keysPrevious)){
+      data->inputBuffer[data->inputBufferWriteCount++ % data->inputBufferCapacity] =
+        {0,1};
+    }
+
+    bool areEntitiesMoving = false;
+    for(int i = 0; i < data->GetCurrentLevel()->entityCount; i++){
+      Entity* entity = &data->GetCurrentLevel()->entityBuffer[i];
+      if(entity->HasBehaviour(CAN_MOVE) && IsMoving(entity)){
+        entity->progress01 += MOVE_SPEED * dt;
+        if(entity->progress01 >= 1){
+          entity->progress01 = 0;
+          entity->xPrev = entity->x;
+          entity->yPrev = entity->y;
+        }
+        if(IsMoving(entity)){
+          areEntitiesMoving = true;
+        }
+      }
+    }
+
+    if(!areEntitiesMoving){
+      if(data->inputBufferReadCount == data->inputBufferWriteCount){
+        return;
+      }
+
+      data->commandTimestamp++;
+
+      for(int i = 0; i < data->GetCurrentLevel()->entityCount; i++){
+        Entity* entity = &data->GetCurrentLevel()->entityBuffer[i];
+        if(entity->HasBehaviour((Behaviour)(RESPOND_TO_INPUT | CAN_MOVE))){
+          int xDir = data->inputBuffer[data->inputBufferReadCount % data->inputBufferCapacity].x;
+          int yDir = data->inputBuffer[data->inputBufferReadCount % data->inputBufferCapacity].y;
+          TryMove(entity, data->GetCurrentLevel(), data->commandBuffer, xDir, yDir, data->commandTimestamp);
+        }
+      }
+      data->inputBufferReadCount++;
+    }
+    /*
     data->commandTimestamp++;
     
     for(int i = 0; i < data->GetCurrentLevel()->entityCount; i++){
@@ -151,10 +206,8 @@ extern "C" {
 
 
       }
-    }
+    }*/
 
-    // copy keys to keysPrevious
-    memcpy((void*)data->keysPrevious, keys, SDL_SCANCODE_COUNT * sizeof(bool));
   }
   void Draw(GameData* data, SDL_Renderer* renderer){
     

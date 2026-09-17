@@ -31,6 +31,11 @@ struct GameData {
 
   uint32_t commandTimestamp;
   
+  Position* inputBuffer;
+  int inputBufferCapacity;
+  int inputBufferWriteCount;
+  int inputBufferReadCount;
+  
   LevelData* GetCurrentLevel(){
     return &levels[currentLevelIndex];
   }

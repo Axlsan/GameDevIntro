@@ -3,14 +3,19 @@
 #include "command.h"
 #include <random>
 
-void Execute(AnyCommand cmd){
+void Execute(AnyCommand cmd, bool fromRedo = false){
   switch(cmd.command.type){
     case CMD_TYPE::NONE:
       break;
     case CMD_TYPE::MOVE:
       MoveCommand mv = cmd.move;
+        mv.entity->xPrev = mv.entity->x;
+        mv.entity->yPrev = mv.entity->y;
         mv.entity->x += mv.xDir;
         mv.entity->y += mv.yDir;
+        if(fromRedo){
+          mv.entity->progress01 = 1;
+        }
         break;
   }
 }
@@ -41,6 +46,7 @@ void Undo(CommandBuffer* buffer){
       MoveCommand mv = cmd.move;
       mv.entity->x -= mv.xDir;
       mv.entity->y -= mv.yDir;
+      mv.entity->progress01 = 1; // anim
       break;
   }
   if(buffer->index > 0){
@@ -60,7 +66,7 @@ void Redo(CommandBuffer* buffer){
     return;
   }
 
-  Execute(cmd);
+  Execute(cmd, true);
 
   buffer->index++;
 

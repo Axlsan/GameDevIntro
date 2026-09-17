@@ -44,24 +44,8 @@ void DrawImGuiArenaUsage(Memory::Arena* arena, std::string nameOfArena){
   
 }
 
-void DEV::Draw(GameData* data, SDL_Renderer* renderer){
-  ImGui::Begin("Dev Tools");
-
-  // CODE HERE
-  DrawImGuiArenaUsage(data->arenaImages, "images");
-  DrawImGuiArenaUsage(data->arenaLevels, "levels");
-  DrawImGuiArenaUsage(data->arenaCommands, "commands");
-  DrawImGuiArenaUsage(data->arenaEntities, "entities");
-  // END CODE
-  ImGui::End();
-  ImGui::Render();
-  ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
-  
-}
-
 void DrawHistory(CommandBuffer* buffer){
   int sliderPos = buffer->index;
-
   if(ImGui::SliderInt("history", &sliderPos, 0, buffer->head)){
     while(buffer->index > sliderPos){
       Undo(buffer);
@@ -72,6 +56,27 @@ void DrawHistory(CommandBuffer* buffer){
   }
 }
 
+
 void DrawFPS(float dt){
   ImGui::Text("FPS: %0.f", 1 / dt);
 }
+
+
+void DEV::Draw(GameData* data, SDL_Renderer* renderer){
+  ImGui::Begin("Dev Tools");
+
+  // CODE HERE
+  DrawImGuiArenaUsage(data->arenaImages, "images");
+  DrawImGuiArenaUsage(data->arenaLevels, "levels");
+  DrawImGuiArenaUsage(data->arenaCommands, "commands");
+  DrawImGuiArenaUsage(data->arenaEntities, "entities");
+  DrawHistory(data->commandBuffer);
+  DrawFPS(*data->dt);
+  
+  // END CODE
+  ImGui::End();
+  ImGui::Render();
+  ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), renderer);
+  
+}
+

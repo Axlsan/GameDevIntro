@@ -22,6 +22,9 @@ struct Entity{
   ID id;
   int x;
   int y;
+  int xPrev;
+  int yPrev;
+  float progress01;
   Behaviour behaviour;
 
   bool HasBehaviour(Behaviour flags){
@@ -59,4 +62,11 @@ struct Entity{
     }
   }
 };
+
+struct Position{
+  int x;
+  int y;
+};
+
+bool IsMoving(Entity* entity);
 
