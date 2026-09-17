@@ -6,6 +6,7 @@
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "levels.h"
+#include "input.h"
 
 struct GameData {
   Image* fallback;
@@ -23,7 +24,7 @@ struct GameData {
 
   float moveSpeed;
 
-  bool* keysPrevious;
+  //bool* keysPrevious;
 
   const float* dt;
 
@@ -42,5 +43,10 @@ struct GameData {
   
   Memory::Arena* arenaCommands;
   CommandBuffer* commandBuffer;
+
+
+  Input input;
+  Arena* arenaInput;
+
 };
 

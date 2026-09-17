@@ -29,6 +29,7 @@ set(EXE_EXCLUSIVE
 set(SHARED_SOURCES
     ${CMAKE_SOURCE_DIR}/src/image.cpp
     ${CMAKE_SOURCE_DIR}/src/arena.cpp
+    ${CMAKE_SOURCE_DIR}/src/input.cpp
 )
 
 set(SHARED_LIB_NAME ${PROJECT_NAME}_common)

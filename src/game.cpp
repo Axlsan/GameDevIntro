@@ -9,6 +9,8 @@
 #include "imgui/imgui_impl_sdlrenderer3.h"
 #include "levelRenderer.h"
 #include "imgui/imgui.h"
+#include "input.h"
+
 #include <cstddef>
 #include <cstdio>
 
@@ -41,7 +43,8 @@ extern "C" {
     }
       return true;
   }
-  
+
+/*  
   bool KeyPressed(SDL_Scancode key, const bool* current, const bool* previous){
     if(previous == nullptr){
       return current[key];
@@ -62,7 +65,8 @@ extern "C" {
     }
     return !current[key] && previous[key];
   }
-
+*/
+  
   bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmdBuffer, int xDir, int yDir, int timestamp){
     if(mover->HasBehaviour(CAN_MOVE) == false){
       return false;
@@ -104,12 +108,13 @@ extern "C" {
   void Update(GameData* data,float dt){
 //    const bool* keys = SDL_GetKeyboardState(NULL);
 
-    const bool* keys = SDL_GetKeyboardState(nullptr);
+    //const bool* keys = SDL_GetKeyboardState(nullptr);
     
 
     // UNDO/REDO
-    if(KeyPressed(SDL_SCANCODE_Z, keys, data->keysPrevious)){
-      if(KeyHeld(SDL_SCANCODE_LSHIFT, keys, data->keysPrevious)){
+    if(KeyPressed(&data->input, SDL_SCANCODE_Z) || KeyHeldForTime(&data->input, SDL_SCANCODE_Z, UNDO_REPEAT_TIME)){
+      ResetKeyHeldTime(&data->input, SDL_SCANCODE_Z);
+      if(KeyHeld(&data->input, SDL_SCANCODE_LSHIFT)){
         Redo(data->commandBuffer);
       }
       else{
@@ -117,22 +122,22 @@ extern "C" {
       }
     }
 
-    if(KeyPressed(SDL_SCANCODE_RIGHT, keys, data->keysPrevious)){
+    if(KeyPressed(&data->input, SDL_SCANCODE_RIGHT) || KeyHeldForTime(&data->input, SDL_SCANCODE_RIGHT, (1 / MOVE_SPEED) * 1.15)){
       data->inputBuffer[data->inputBufferWriteCount++ % data->inputBufferCapacity] =
         {1,0};
     }
     
-    else if(KeyPressed(SDL_SCANCODE_LEFT, keys, data->keysPrevious)){
+    else if(KeyPressed(&data->input, SDL_SCANCODE_LEFT) || KeyHeldForTime(&data->input, SDL_SCANCODE_LEFT, (1 / MOVE_SPEED) * 1.15)){
       data->inputBuffer[data->inputBufferWriteCount++ % data->inputBufferCapacity] =
         {-1,0};
     }
 
-    else if(KeyPressed(SDL_SCANCODE_UP, keys, data->keysPrevious)){
+    else if(KeyPressed(&data->input, SDL_SCANCODE_UP) || KeyHeldForTime(&data->input, SDL_SCANCODE_UP, (1 / MOVE_SPEED) * 1.15)){
       data->inputBuffer[data->inputBufferWriteCount++ % data->inputBufferCapacity] =
         {0,-1};
     }
 
-    else if(KeyPressed(SDL_SCANCODE_DOWN, keys, data->keysPrevious)){
+    else if(KeyPressed(&data->input, SDL_SCANCODE_DOWN) || KeyHeldForTime(&data->input, SDL_SCANCODE_DOWN, (1 / MOVE_SPEED) * 1.15)){
       data->inputBuffer[data->inputBufferWriteCount++ % data->inputBufferCapacity] =
         {0,1};
     }

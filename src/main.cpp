@@ -10,11 +10,13 @@
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_keycode.h"
 #include "SDL3/SDL_render.h"
+#include "SDL3/SDL_scancode.h"
 #include "SDL3/SDL_timer.h"
 #include "command.h"
 #include "common.h"
 #include "arena.h"
 #include "gameState.h"
+#include "input.h"
 #include "levels.h"
 
 SDL_Window* window;
@@ -170,7 +172,7 @@ int main() {
   gameData->levels = (LevelData*)Memory::Allocate(gameData->arenaLevels, sizeof(LevelData) * gameData->levelCount);
 
 
-  gameData->keysPrevious = (bool*)Memory::Allocate(gameData->arenaLevels, sizeof(bool) * SDL_SCANCODE_COUNT);
+  gameData->input.keysPrevious = (bool*)Memory::Allocate(gameData->arenaLevels, sizeof(bool) * SDL_SCANCODE_COUNT);
 
   //Commandbuffer
   gameData->commandBuffer = (CommandBuffer*)Memory::Allocate(gameData->arenaLevels, sizeof(CommandBuffer));
@@ -183,7 +185,17 @@ int main() {
   size_t RING_BUFFER_SIZE = sizeof(Position) * gameData->inputBufferCapacity;
   gameData->inputBuffer = (Position*)Memory::Allocate(gameData->arenaLevels, RING_BUFFER_SIZE);
 
-  
+  // Input arena
+  size_t INPUT_ARENA_SIZE = 0;
+  INPUT_ARENA_SIZE += sizeof(bool) * SDL_SCANCODE_COUNT * 2;
+  INPUT_ARENA_SIZE += sizeof(float) * SDL_SCANCODE_COUNT;
+  INPUT_ARENA_SIZE += 128;
+  gameData->arenaInput = Memory::CreateSubArena(arenaMain, INPUT_ARENA_SIZE);
+
+  gameData->input.keysCurrent = (bool*)Memory::Allocate(gameData->arenaInput, sizeof(bool) * SDL_SCANCODE_COUNT);
+  gameData->input.keysPrevious = (bool*)Memory::Allocate(gameData->arenaInput, sizeof(bool) * SDL_SCANCODE_COUNT);
+  gameData->input.keysHeldTime = (float*)Memory::Allocate(gameData->arenaInput, sizeof(float) * SDL_SCANCODE_COUNT);
+    
   SDL_Setup();
 
 
@@ -230,12 +242,16 @@ int main() {
         if(event.key.key == SDLK_F10) RetrieveGameState(arenaMain);
       }
     }
+    gameData->input.keysCurrent = SDL_GetKeyboardState(nullptr);
     dll.update(gameData, dt);
+    UpdateKeys(&gameData->input, dt);
     dll.draw(gameData, renderer);
 
+    /*
     // copy keys to keysPrevious
-    memcpy((void*)gameData->keysPrevious, SDL_GetKeyboardState(nullptr), SDL_SCANCODE_COUNT * sizeof(bool));
-
+    memcpy((void*)gameData->input.keysPrevious, SDL_GetKeyboardState(nullptr), SDL_SCANCODE_COUNT * sizeof(bool));
+    */
+    
     double time_to_sleep_ms;
     CalculateRemainingFrameTime_MS(&time_to_sleep_ms);
 
