@@ -1,5 +1,8 @@
 #pragma once
 #include "SDL3/SDL_render.h"
 #include "image.h"
+#include "camera.h"
+#include "levels.h"
 
-void RenderSprite(Image* sprite, SDL_Renderer* renderer, int xPos, int yPos, float scale);
+void RenderSprite_World(Image* sprite, SDL_Renderer* renderer, const Camera* camera, float xPos, float yPos, float scale = 1);
+void RenderSprite_Grid(Image* sprite, LevelData* lvl, SDL_Renderer* renderer, const Camera* camera, float xPos, float yPos, float scale = 1);

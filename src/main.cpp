@@ -1,4 +1,3 @@
-#include <sdkddkver.h>
 #include <windows.h>
 #include <cstddef>
 #include <timeapi.h>

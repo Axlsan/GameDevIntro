@@ -1,6 +1,7 @@
 #pragma once
 #include "SDL3/SDL_rect.h"
 #include "arena.h"
+#include "camera.h"
 #include "command.h"
 #include "image.h"
 #include "imgui/imgui.h"
@@ -48,5 +49,6 @@ struct GameData {
   Input input;
   Arena* arenaInput;
 
+  Camera camera;
 };
 

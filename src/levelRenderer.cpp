@@ -9,14 +9,14 @@
 
 void RenderLevel(GameData* gameData, SDL_Renderer* renderer){
 
-  LevelData lvl = gameData->levels[gameData->currentLevelIndex];
+  LevelData lvlData = gameData->levels[gameData->currentLevelIndex];
 
-  int boardWidthPxHalf = lvl.w * CELL_SIZE_PX / 2;
-  int boardHeightPxHalf = lvl.h * CELL_SIZE_PX / 2;
+  int boardWidthPxHalf = lvlData.w * CELL_SIZE_PX / 2;
+  int boardHeightPxHalf = lvlData.h * CELL_SIZE_PX / 2;
 
-  for(int x = 0; x < lvl.w; x++){
-    for(int y = 0; y < lvl.h; y++){
-      uint8_t cellType = lvl.getCellID(x, y);
+  for(int x = 0; x < lvlData.w; x++){
+    for(int y = 0; y < lvlData.h; y++){
+      uint8_t cellType = lvlData.getCellID(x, y);
 
       Image* sprite;
       switch (cellType) {
@@ -32,7 +32,7 @@ void RenderLevel(GameData* gameData, SDL_Renderer* renderer){
           sprite = gameData->fallback;
           break;
       }
-
+      /*
       float xPos = x * CELL_SIZE_PX;
       float yPos = y * CELL_SIZE_PX;
 
@@ -41,8 +41,8 @@ void RenderLevel(GameData* gameData, SDL_Renderer* renderer){
 
       xPos -= boardWidthPxHalf;
       yPos -= boardHeightPxHalf;
-
-      RenderSprite(sprite, renderer, xPos, yPos, UPSCALE_FACTOR);
+      */
+      RenderSprite_Grid(sprite, &lvlData, renderer, &gameData->camera, x, y);
     }
   }
 }
@@ -63,7 +63,7 @@ void RenderEntities(GameData* data, SDL_Renderer* renderer){
         img = data->fallback;
         break;
     }
-
+    /*
     int xPos = 0;
     int yPos = 0;
 
@@ -72,14 +72,15 @@ void RenderEntities(GameData* data, SDL_Renderer* renderer){
 
     xPos -= data->levels[data->currentLevelIndex].w * CELL_SIZE_PX / 2;
     yPos -= data->levels[data->currentLevelIndex].h * CELL_SIZE_PX / 2;
-
+    */
     // Animation
     float xAnimated = std::lerp(entity.xPrev, entity.x, entity.progress01);
     float yAnimated = std::lerp(entity.yPrev, entity.y, entity.progress01);
 
+    /*
     xPos += xAnimated * CELL_SIZE_PX;
     yPos += yAnimated * CELL_SIZE_PX;
-
-    RenderSprite(img, renderer, xPos, yPos, UPSCALE_FACTOR);
+    */
+    RenderSprite_Grid(img, &lvlData, renderer, &data->camera, xAnimated, yAnimated);
   }
 }
