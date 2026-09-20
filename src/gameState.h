@@ -3,18 +3,18 @@
 #include "arena.h"
 #include "camera.h"
 #include "command.h"
-#include "image.h"
+#include "spriteLibrary.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
 #include "levels.h"
 #include "input.h"
 
 struct GameData {
-  Image* fallback;
-  Image* wall;
-  Image* ground;
-  Image* player;
-  Image* box;
+  Sprite* fallback;
+  Sprite* wall;
+  Sprite* ground;
+  Sprite* player;
+  Sprite* box;
   Memory::Arena* arenaLevels;
   Memory::Arena* arenaEntities;
   Memory::Arena* arenaImages;
@@ -50,5 +50,7 @@ struct GameData {
   Arena* arenaInput;
 
   Camera camera;
+
+  Sprite* spriteBuffer;
 };
 

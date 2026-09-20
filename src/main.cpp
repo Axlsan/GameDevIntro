@@ -157,10 +157,12 @@ int main() {
   Memory::Initialize(arenaMain, game_memory, GAME_MEMORY_ALLOWANCE);
   GameData* gameData = (GameData*)Memory::Allocate(arenaMain, sizeof(GameData));
 
-
-  size_t IMAGE_ARENA_SIZE = sizeof(Image) * 100;
+  int SPRITE_COUNT = 256;
+  size_t IMAGE_ARENA_SIZE = sizeof(Sprite) * 100;
 
   gameData->arenaImages = Memory::CreateSubArena(arenaMain, IMAGE_ARENA_SIZE);
+  gameData->spriteBuffer = (Sprite*)Memory::Allocate(gameData->arenaImages, sizeof(Sprite) * SPRITE_COUNT);
+
   gameData->arenaLevels = Memory::CreateSubArena(arenaMain, MEGABYTES(3));
   gameData->arenaEntities = Memory::CreateSubArena(gameData->arenaLevels, MEGABYTES(1));
 
@@ -197,12 +199,12 @@ int main() {
     
   SDL_Setup();
 
-
+  /*
   gameData->fallback = AssetManagement::LoadSprite(gameData->arenaImages, renderer, "dog.png");
   if(gameData->fallback == nullptr){
     return 1;
   }
-
+  */
 
   MMRESULT result = timeBeginPeriod(1);
   if(result == TIMERR_NOCANDO){

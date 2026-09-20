@@ -5,7 +5,7 @@
 #include "common.h"
 #include "levels.h"
 
-void RenderSprite_World(Image* sprite, SDL_Renderer* renderer, const Camera* camera, float xPos, float yPos, float scale){
+void RenderSprite_World(Sprite* sprite, SDL_Renderer* renderer, const Camera* camera, float xPos, float yPos, float scale){
   SDL_FRect rect;
   rect.x = xPos;
   rect.y = yPos;
@@ -17,7 +17,7 @@ void RenderSprite_World(Image* sprite, SDL_Renderer* renderer, const Camera* cam
   SDL_RenderTexture(renderer, sprite->texture, NULL, &rect);
 }
 
-void RenderSprite_Grid(Image *sprite, LevelData* lvl, SDL_Renderer *renderer, const Camera *camera, float xPos, float yPos, float scale){
+void RenderSprite_Grid(Sprite *sprite, LevelData* lvl, SDL_Renderer *renderer, const Camera *camera, float xPos, float yPos, float scale){
   camera::GridToWorld(&xPos, &yPos, lvl);
   RenderSprite_World(sprite, renderer, camera, xPos, yPos, scale);
 }

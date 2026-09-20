@@ -10,6 +10,7 @@
 #include "levelRenderer.h"
 #include "imgui/imgui.h"
 #include "input.h"
+#include "spriteLibrary.h"
 
 #include <cstddef>
 #include <cstdio>
@@ -19,12 +20,16 @@ extern "C" {
 //    printf("dll sizeof(GameData) = %zu\n", sizeof(GameData));
     DEV::Initialize(window, renderer);
     data->ImGUIContext = ImGui::GetCurrentContext();
-    
+
+    /*
     data->ground = AssetManagement::LoadSprite(data->arenaImages, renderer, "ground.png");
     data->wall = AssetManagement::LoadSprite(data->arenaImages, renderer, "wall.png");
     data->player = AssetManagement::LoadSprite(data->arenaImages, renderer, "player.png");
     data->box = AssetManagement::LoadSprite(data->arenaImages, renderer, "box.png");
+    */
 
+    AssetManagement::LoadAllSprites(data->spriteBuffer, renderer);
+    
     data->currentLevelIndex = 1;
     CreateLevel(data->arenaLevels, &data->levels[0], "assets/levels/map.tmj");
     CreateLevel(data->arenaLevels, &data->levels[1], "assets/levels/map_box.tmj");
