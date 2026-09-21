@@ -76,6 +76,11 @@ void DrawSamples(){
   
 }
 
+
+void DrawMouseClick(GameData* data){
+  ImGui::Text("Mouse: %d", data->input.mouseCurrent );
+}
+
 void DEV::Draw(GameData* data, SDL_Renderer* renderer){
   ImGui::Begin("Dev Tools");
 
@@ -89,6 +94,7 @@ void DEV::Draw(GameData* data, SDL_Renderer* renderer){
 
   DrawColor();
   DrawSamples();
+  DrawMouseClick(data);
   
   // END CODE
   ImGui::End();

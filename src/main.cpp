@@ -8,6 +8,7 @@
 #include "SDL3/SDL_events.h"
 #include "SDL3/SDL_init.h"
 #include "SDL3/SDL_keycode.h"
+#include "SDL3/SDL_mouse.h"
 #include "SDL3/SDL_render.h"
 #include "SDL3/SDL_scancode.h"
 #include "SDL3/SDL_timer.h"
@@ -168,7 +169,7 @@ int main() {
 
   gameData->arenaCommands =Memory::CreateSubArena(gameData->arenaLevels, MEGABYTES(1));
   
-  // Allocate the pointer (array) of levels
+  // Levels
   gameData->levelCount = 2; 
   gameData->levels = (LevelData*)Memory::Allocate(gameData->arenaLevels, sizeof(LevelData) * gameData->levelCount);
 
@@ -196,7 +197,10 @@ int main() {
   gameData->input.keysCurrent = (bool*)Memory::Allocate(gameData->arenaInput, sizeof(bool) * SDL_SCANCODE_COUNT);
   gameData->input.keysPrevious = (bool*)Memory::Allocate(gameData->arenaInput, sizeof(bool) * SDL_SCANCODE_COUNT);
   gameData->input.keysHeldTime = (float*)Memory::Allocate(gameData->arenaInput, sizeof(float) * SDL_SCANCODE_COUNT);
-    
+
+  int mouseButtonCount = 3;
+  gameData->input.mouseHeldTime = (float*)Memory::Allocate(gameData->arenaInput, sizeof(float) * mouseButtonCount);
+  
   SDL_Setup();
 
   /*
@@ -244,8 +248,14 @@ int main() {
       }
     }
     gameData->input.keysCurrent = SDL_GetKeyboardState(nullptr);
+
+    gameData->input.mouseCurrent = SDL_GetMouseState(&gameData->input.mouseX, &gameData->input.mouseY);
+    
     dll.update(gameData, dt);
+
     UpdateKeys(&gameData->input, dt);
+    UpdateMouse(&gameData->input, dt);
+
     dll.draw(gameData, renderer);
 
     /*
