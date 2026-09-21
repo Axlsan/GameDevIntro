@@ -17,7 +17,7 @@ enum class SPRITE_ID{
   Rock,
   Demon,
   Medusa,
-  Ghost,
+  Siren,
   Golem
 };
 

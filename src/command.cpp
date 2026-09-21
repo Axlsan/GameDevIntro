@@ -1,9 +1,10 @@
 
 
 #include "command.h"
+#include "levels.h"
 #include <random>
 
-void Execute(AnyCommand cmd, bool fromRedo = false){
+void Execute(AnyCommand cmd, LevelData* lvl, bool fromRedo = false){
   switch(cmd.command.type){
     case CMD_TYPE::NONE:
       break;
@@ -20,14 +21,16 @@ void Execute(AnyCommand cmd, bool fromRedo = false){
   }
 }
 
-void Push(CommandBuffer* buffer, AnyCommand cmd, int timestamp){
+void Push(CommandBuffer* buffer, AnyCommand cmd, LevelData* lvl, uint32_t timestamp){
+  assert(cmd.command.type != CMD_TYPE::NONE);
+  
   buffer->allCommands[buffer->index] = cmd;
 
   buffer->allCommands[buffer->index].command.timestamp = timestamp;
   
   buffer->index++;
   buffer->head = buffer->index;
-  Execute(cmd);
+  Execute(cmd, lvl);
 }
 
 void Undo(CommandBuffer* buffer){
@@ -56,7 +59,7 @@ void Undo(CommandBuffer* buffer){
   }
 }
 
-void Redo(CommandBuffer* buffer){
+void Redo(CommandBuffer* buffer, LevelData* lvl){
   AnyCommand cmd = buffer->allCommands[buffer->index];
   if(cmd.command.type == CMD_TYPE::NONE){
     return;
@@ -66,7 +69,7 @@ void Redo(CommandBuffer* buffer){
     return;
   }
 
-  Execute(cmd, true);
+  Execute(cmd, lvl, true);
 
   buffer->index++;
 
@@ -75,7 +78,8 @@ void Redo(CommandBuffer* buffer){
   if(buffer->index != buffer->head){
     AnyCommand nextCommand = buffer->allCommands[buffer->index];
     if(nextCommand.command.timestamp == timestamp){
-      Redo(buffer);
+      Redo(buffer, lvl);
     }
   }
 }
+ 

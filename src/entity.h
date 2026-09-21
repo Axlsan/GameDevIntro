@@ -17,7 +17,7 @@ enum class ID : uint8_t {
   DEMON = 6,
   ROCK = 7,
   MEDUSA = 1,
-  GHOST = 2,
+  SIREN = 2,
   GOLEM = 3
   
   /*NONE = 0,
@@ -36,45 +36,8 @@ struct Entity{
   float progress01;
   Behaviour behaviour;
 
-  bool HasBehaviour(Behaviour flags){
-    return (behaviour & flags) == flags;
-  }
+  int strength;
 
-  void SetBehaviour(Behaviour flags){
-    behaviour = flags;
-  }
-
-  void AddBehaviour(Behaviour flags){
-    behaviour = (Behaviour)(behaviour | flags);
-  }
-
-  void RemoveBehaviour(Behaviour flags){
-    behaviour = (Behaviour)(behaviour & ~flags);
-  }
-
-  
-  void InitializeBaseBehaviour(){
-    assert(id != ID::NONE);
-    switch (id) {
-
-      default:
-        SetBehaviour(NONE);
-        break;
-
-      case ID::MEDUSA:
-        SetBehaviour((Behaviour)(CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
-        break;
-        
-      case ID::DEMON:
-        SetBehaviour((Behaviour)(CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
-        break;
-
-      case ID::ROCK:
-        SetBehaviour((Behaviour)CAN_MOVE);
-        break;
-
-    }
-  }
 };
 
 
@@ -83,5 +46,17 @@ struct Position{
   int y;
 };
 
+enum class Direction{
+  RIGHT,
+  LEFT,
+  UP,
+  DOWN
+};
+
 bool IsMoving(Entity* entity);
 
+bool HasBehaviour(Entity* entity, Behaviour flags);
+void InitializeBaseBehaviour(Entity* entity);
+void SetBehaviour(Entity* entity, Behaviour flags);
+void AddBehaviour(Entity* entity, Behaviour flags);
+void RemoveBehaviour(Entity* entity, Behaviour flags);

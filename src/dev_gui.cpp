@@ -46,14 +46,14 @@ void DrawImGuiArenaUsage(Memory::Arena* arena, std::string nameOfArena){
   
 }
 
-void DrawHistory(CommandBuffer* buffer){
+void DrawHistory(CommandBuffer* buffer, LevelData* lvl){
   int sliderPos = buffer->index;
   if(ImGui::SliderInt("history", &sliderPos, 0, buffer->head)){
     while(buffer->index > sliderPos){
       Undo(buffer);
     }
     while(buffer->index < sliderPos){
-      Redo(buffer);
+      Redo(buffer, lvl);
     }
   }
 }
@@ -93,7 +93,7 @@ void DEV::Draw(GameData* data, SDL_Renderer* renderer){
   DrawImGuiArenaUsage(data->arenaLevels, "levels");
   DrawImGuiArenaUsage(data->arenaCommands, "commands");
   DrawImGuiArenaUsage(data->arenaEntities, "entities");
-  DrawHistory(data->commandBuffer);
+  DrawHistory(data->commandBuffer, data->GetCurrentLevel());
   DrawFPS(*data->dt);
 
   DrawColor();

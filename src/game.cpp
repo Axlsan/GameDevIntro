@@ -73,8 +73,12 @@ extern "C" {
   }
 */
   
-  bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmdBuffer, int xDir, int yDir, int timestamp){
-    if(mover->HasBehaviour(CAN_MOVE) == false){
+  bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmdBuffer, int xDir, int yDir, int timestamp, int strength){
+    if(HasBehaviour(mover, CAN_MOVE)){
+      return false;
+    }
+
+    if(strength < 0){
       return false;
     }
 
@@ -86,25 +90,25 @@ extern "C" {
 
     if(stepIntoEntity == nullptr){
       if(stepIntoTileID == ID::GROUND){
-        MoveCommand mv;
+        MoveCommand mv(mover, xDir, yDir);
         mv.type = CMD_TYPE::MOVE;
         mv.entity = mover;
         mv.xDir = xDir;
         mv.yDir = yDir;
-        Push(cmdBuffer, mv, timestamp);
+        Push(cmdBuffer, mv, level, timestamp);
         return true;
       }
       return false;
     }
     
-    if(stepIntoEntity->HasBehaviour(CAN_MOVE)){
-      if(TryMove(stepIntoEntity, level, cmdBuffer, xDir, yDir, timestamp)){
-        MoveCommand mv;
+    if(HasBehaviour(stepIntoEntity, CAN_MOVE)){
+      if (TryMove(stepIntoEntity, level, cmdBuffer, xDir, yDir, timestamp, --strength)) {
+        MoveCommand mv(mover, xDir, yDir);
         mv.type = CMD_TYPE::MOVE;
         mv.entity = mover;
         mv.xDir = xDir;
         mv.yDir = yDir;
-        Push(cmdBuffer, mv, timestamp);
+        Push(cmdBuffer, mv, level, timestamp);
         return true;
       }
     }
@@ -155,7 +159,7 @@ extern "C" {
     bool areEntitiesMoving = false;
     for(int i = 0; i < data->GetCurrentLevel()->entityCount; i++){
       Entity* entity = &data->GetCurrentLevel()->entityBuffer[i];
-      if(entity->HasBehaviour(CAN_MOVE) && IsMoving(entity)){
+      if(HasBehaviour(entity, CAN_MOVE) && IsMoving(entity)){
         entity->progress01 += MOVE_SPEED * dt;
         if(entity->progress01 >= 1){
           entity->progress01 = 0;
@@ -177,53 +181,17 @@ extern "C" {
 
       for(int i = 0; i < data->GetCurrentLevel()->entityCount; i++){
         Entity* entity = &data->GetCurrentLevel()->entityBuffer[i];
-        if(entity->HasBehaviour((Behaviour)(RESPOND_TO_INPUT | CAN_MOVE))){
+        if(HasBehaviour(entity, (Behaviour)(RESPOND_TO_INPUT | CAN_MOVE))){
           int xDir = data->inputBuffer[data->inputBufferReadCount % data->inputBufferCapacity].x;
           int yDir = data->inputBuffer[data->inputBufferReadCount % data->inputBufferCapacity].y;
-          TryMove(entity, data->GetCurrentLevel(), data->commandBuffer, xDir, yDir, data->commandTimestamp);
+          TryMove(entity, data->GetCurrentLevel(), data->commandBuffer, xDir, yDir, data->commandTimestamp, entity->strength);
         }
       }
       data->inputBufferReadCount++;
     }
-    /*
-    data->commandTimestamp++;
-    
-    for(int i = 0; i < data->GetCurrentLevel()->entityCount; i++){
-      Entity* entity = &data->GetCurrentLevel()->entityBuffer[i];
-
-      if(entity->HasBehaviour((Behaviour)(Behaviour::RESPOND_TO_INPUT | Behaviour::CAN_MOVE))){
-        int xChange = 0;
-        int yChange = 0;
-
-        if(KeyPressed(SDL_SCANCODE_RIGHT, keys, data->keysPrevious)){
-          xChange = 1;
-        }
-
-        else if(KeyPressed(SDL_SCANCODE_LEFT, keys, data->keysPrevious)){
-          xChange = -1;
-        }
-
-        else if(KeyPressed(SDL_SCANCODE_UP, keys, data->keysPrevious)){
-          yChange = -1;
-        }
-
-        else if(KeyPressed(SDL_SCANCODE_DOWN, keys, data->keysPrevious)){
-          yChange = 1;
-        }
-
-
-
-        
-        if(xChange != 0 || yChange != 0){
-          TryMove(entity, data->GetCurrentLevel(), data->commandBuffer, xChange, yChange, data->commandTimestamp);
-        
-        }
-
-
-      }
-    }*/
-
   }
+
+
   void Draw(GameData* data, SDL_Renderer* renderer){
     
     
