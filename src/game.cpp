@@ -7,6 +7,7 @@
 #include "entity.h"
 #include "gameState.h"
 #include "imgui/imgui_impl_sdlrenderer3.h"
+#include "levelEditor.h"
 #include "levelRenderer.h"
 #include "imgui/imgui.h"
 #include "input.h"
@@ -111,10 +112,14 @@ extern "C" {
   }
   
   void Update(GameData* data,float dt){
-//    const bool* keys = SDL_GetKeyboardState(NULL);
-
-    //const bool* keys = SDL_GetKeyboardState(nullptr);
     
+    //Level edit
+    if(KeyPressed(&data->input, SDL_SCANCODE_F2)){
+      data->editLevel = !data->editLevel;
+    }
+    if(data->editLevel){
+      EDITOR::Update(&data->editorData, &data->input, data->GetCurrentLevel());
+    }
 
     // UNDO/REDO
     if(KeyPressed(&data->input, SDL_SCANCODE_Z) || KeyHeldForTime(&data->input, SDL_SCANCODE_Z, UNDO_REPEAT_TIME)){

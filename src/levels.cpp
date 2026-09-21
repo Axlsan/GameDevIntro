@@ -1,5 +1,6 @@
 #include <cstdint>
 #include <fstream>
+#include <new>
 #include <vector>
 
 #include "Parsers/json.hpp"
@@ -37,17 +38,20 @@ void CreateEntities(LevelData* lvlData, Arena* arena){
   auto result = nlohmann::json::parse(stream);
   auto entityData = result["layers"][ENTITIES_INDEX]["data"].get<vector<uint8_t>>();
 
-/*
-  for(int i = 0; i < lvlData->w * lvlData->h; i++){
+  
+  lvlData->entityBuffer = (Entity*)Memory::Allocate(arena, sizeof(Entity) * lvlData->entityCount);
+
+
+  for(int i = 0; i< lvlData->w; i++){
     unsigned char entityID = entityData[i];
     if(entityID != 0){
-      lvlData->entityCount++;
+      int x = i % lvlData->w;
+      int y = i / lvlData->w;
+      AddEntity((ID)entityID, x, y, lvlData);
     }
   }
-*/
-  
+  /*
   // En schwanky lösning
-  lvlData->entityBuffer = (Entity*)Memory::Allocate(arena, sizeof(Entity) * lvlData->entityCount);
   int index = 0;
   for(int i = 0; i < lvlData->w * lvlData->h; i++){
     unsigned char entityID = entityData[i];
@@ -63,4 +67,38 @@ void CreateEntities(LevelData* lvlData, Arena* arena){
 
     }
   }
+  */
+}
+
+Entity* GetNextAvailableEntitySlot(LevelData* lvl){
+  for(int i = 0; i < lvl->entityCount; i++){
+    if(lvl->entityBuffer[i].id == ID::NONE){
+      return &lvl->entityBuffer[i];
+    }
+  }
+  return &lvl->entityBuffer[lvl->entityCount++];
+}
+
+void AddEntity(ID entityID, int x, int y, LevelData* lvl){
+  Entity* entity = lvl->GetEntity(x, y);
+
+  if(entity == nullptr){
+    entity = GetNextAvailableEntitySlot(lvl);
+  }
+
+  entity->x = x;
+  entity->y = y;
+  entity->xPrev = x;
+  entity->yPrev = y;
+  entity->id = entityID;
+  entity->InitializeBaseBehaviour();
+}
+
+void RemoveEntity(int x, int y, LevelData* lvl){
+  Entity* entity = lvl->GetEntity(x, y);
+  if(entity == nullptr){
+    return;
+  }
+
+  *entity = {}; //nullptr?
 }

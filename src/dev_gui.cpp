@@ -6,6 +6,7 @@
 #include "imgui/imgui_impl_sdl3.h"
 #include "imgui/imgui_impl_sdlrenderer3.h"
 #include "imgui/imgui_internal.h"
+#include "levelEditor.h"
 #include <cmath>
 #include <string>
 
@@ -81,6 +82,9 @@ void DrawMouseClick(GameData* data){
   ImGui::Text("Mouse: %d", data->input.mouseCurrent );
 }
 
+
+
+
 void DEV::Draw(GameData* data, SDL_Renderer* renderer){
   ImGui::Begin("Dev Tools");
 
@@ -95,6 +99,11 @@ void DEV::Draw(GameData* data, SDL_Renderer* renderer){
   DrawColor();
   DrawSamples();
   DrawMouseClick(data);
+
+  if(data->editLevel){
+    EDITOR::DrawObjectPanel(&data->editorData, data->spriteBuffer);
+    EDITOR::DrawPreview(&data->editorData, &data->input, renderer, data->GetCurrentLevel(), &data->camera, data->spriteBuffer);
+  }
   
   // END CODE
   ImGui::End();

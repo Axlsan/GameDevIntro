@@ -3,6 +3,7 @@
 #include "arena.h"
 #include "camera.h"
 #include "command.h"
+#include "levelEditor.h"
 #include "spriteLibrary.h"
 #include "imgui/imgui.h"
 #include "imgui/imgui_internal.h"
@@ -52,5 +53,8 @@ struct GameData {
   Camera camera;
 
   Sprite* spriteBuffer;
+
+  bool editLevel;
+  Editor editorData;
 };
 
