@@ -73,8 +73,8 @@ extern "C" {
   }
 */
   
-  bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmdBuffer, int xDir, int yDir, int timestamp, int strength){
-    if(HasBehaviour(mover, CAN_MOVE)){
+  bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmdBuffer, int xDir, int yDir, int strength){
+    if(!HasBehaviour(mover, CAN_MOVE)){
       return false;
     }
 
@@ -85,8 +85,8 @@ extern "C" {
     int testX = mover->x + xDir;
     int testY = mover->y + yDir;
     
-    Entity* stepIntoEntity = level->GetEntity(testX, testY);
-    ID stepIntoTileID = (ID)level->getCellID(testX, testY);
+    Entity* stepIntoEntity = GetEntity(level, testX, testY);
+    ID stepIntoTileID = (ID)getCellID(level, testX, testY);
 
     if(stepIntoEntity == nullptr){
       if(stepIntoTileID == ID::GROUND){
@@ -95,20 +95,20 @@ extern "C" {
         mv.entity = mover;
         mv.xDir = xDir;
         mv.yDir = yDir;
-        Push(cmdBuffer, mv, level, timestamp);
+        Push(cmdBuffer, mv, level);
         return true;
       }
       return false;
     }
     
-    if(HasBehaviour(stepIntoEntity, CAN_MOVE)){
-      if (TryMove(stepIntoEntity, level, cmdBuffer, xDir, yDir, timestamp, --strength)) {
+    if(HasBehaviour(stepIntoEntity, CAN_MOVE) && !HasBehaviour(stepIntoEntity, UNPUSHABLE)){
+      if (TryMove(stepIntoEntity, level, cmdBuffer, xDir, yDir, --strength)) {
         MoveCommand mv(mover, xDir, yDir);
         mv.type = CMD_TYPE::MOVE;
         mv.entity = mover;
         mv.xDir = xDir;
         mv.yDir = yDir;
-        Push(cmdBuffer, mv, level, timestamp);
+        Push(cmdBuffer, mv, level);
         return true;
       }
     }
@@ -129,7 +129,7 @@ extern "C" {
     if(KeyPressed(&data->input, SDL_SCANCODE_Z) || KeyHeldForTime(&data->input, SDL_SCANCODE_Z, UNDO_REPEAT_TIME)){
       ResetKeyHeldTime(&data->input, SDL_SCANCODE_Z);
       if(KeyHeld(&data->input, SDL_SCANCODE_LSHIFT)){
-        Redo(data->commandBuffer);
+        Redo(data->commandBuffer, data->GetCurrentLevel());
       }
       else{
         Undo(data->commandBuffer);
@@ -177,14 +177,22 @@ extern "C" {
         return;
       }
 
-      data->commandTimestamp++;
+      data->commandBuffer->timestamp++;
 
       for(int i = 0; i < data->GetCurrentLevel()->entityCount; i++){
         Entity* entity = &data->GetCurrentLevel()->entityBuffer[i];
         if(HasBehaviour(entity, (Behaviour)(RESPOND_TO_INPUT | CAN_MOVE))){
+          if(HasBehaviour(entity, Behaviour::IS_PETRIFIED)){
+            continue;
+          }
           int xDir = data->inputBuffer[data->inputBufferReadCount % data->inputBufferCapacity].x;
           int yDir = data->inputBuffer[data->inputBufferReadCount % data->inputBufferCapacity].y;
-          TryMove(entity, data->GetCurrentLevel(), data->commandBuffer, xDir, yDir, data->commandTimestamp, entity->strength);
+
+          Direction newFacing = DirectionFromXY(xDir, yDir);
+          if(newFacing != entity->facing){
+            RotateCommand rotate(entity, entity->facing, newFacing);
+          }
+          TryMove(entity, data->GetCurrentLevel(), data->commandBuffer, xDir, yDir, entity->strength);
         }
       }
       data->inputBufferReadCount++;

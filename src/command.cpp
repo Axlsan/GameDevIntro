@@ -1,14 +1,15 @@
 
 
 #include "command.h"
+#include "entity.h"
 #include "levels.h"
 #include <random>
 
-void Execute(AnyCommand cmd, LevelData* lvl, bool fromRedo = false){
+void Execute(AnyCommand cmd, LevelData* lvl, CommandBuffer* commandBuffer, bool fromRedo = false){
   switch(cmd.command.type){
     case CMD_TYPE::NONE:
       break;
-    case CMD_TYPE::MOVE:
+    case CMD_TYPE::MOVE:{
       MoveCommand mv = cmd.move;
         mv.entity->xPrev = mv.entity->x;
         mv.entity->yPrev = mv.entity->y;
@@ -17,20 +18,47 @@ void Execute(AnyCommand cmd, LevelData* lvl, bool fromRedo = false){
         if(fromRedo){
           mv.entity->progress01 = 1;
         }
+        
+
+        PostMove(mv.entity, lvl, commandBuffer);
+        
         break;
+    }
+    case CMD_TYPE::ROTATE:{
+      RotateCommand rotate = cmd.rotate;
+      if(!HasBehaviour(rotate.entity, CAN_ROTATE)){
+        break;
+      }
+
+      PreRotation(rotate.entity, lvl, commandBuffer, rotate.from, rotate.to);
+      
+      rotate.entity->facing = rotate.to;
+
+      PostRotation(rotate.entity, lvl, commandBuffer, rotate.from, rotate.to);
+    }
+    case CMD_TYPE::MODIFY_BEHAVIOUR:{
+        ModifyBehaviourCommand modify = cmd.modify;
+        if(modify.mode == ModifyBehaviourCommand::ADD){
+          AddBehaviour(modify.entity, modify.flag);
+        }
+        else{
+          RemoveBehaviour(modify.entity, modify.flag);
+        }
+        break;
+      }
   }
 }
 
-void Push(CommandBuffer* buffer, AnyCommand cmd, LevelData* lvl, uint32_t timestamp){
+void Push(CommandBuffer* buffer, AnyCommand cmd, LevelData* lvl){
   assert(cmd.command.type != CMD_TYPE::NONE);
   
   buffer->allCommands[buffer->index] = cmd;
 
-  buffer->allCommands[buffer->index].command.timestamp = timestamp;
+  buffer->allCommands[buffer->index].command.timestamp = buffer->timestamp;
   
   buffer->index++;
   buffer->head = buffer->index;
-  Execute(cmd, lvl);
+  Execute(cmd, lvl, buffer);
 }
 
 void Undo(CommandBuffer* buffer){
@@ -45,12 +73,31 @@ void Undo(CommandBuffer* buffer){
     case CMD_TYPE::NONE:
       break;
 
-    case CMD_TYPE::MOVE:
+    case CMD_TYPE::MOVE:{
       MoveCommand mv = cmd.move;
       mv.entity->x -= mv.xDir;
       mv.entity->y -= mv.yDir;
       mv.entity->progress01 = 1; // anim
       break;
+    }
+    case CMD_TYPE::ROTATE:{
+      RotateCommand rotate = cmd.rotate;
+      if(!HasBehaviour(rotate.entity, Behaviour::CAN_ROTATE)){
+        break;
+      }
+      rotate.entity->facing = rotate.from;
+      // break;
+    }
+    case CMD_TYPE::MODIFY_BEHAVIOUR:{
+        ModifyBehaviourCommand modify = cmd.modify;
+        if(modify.mode == ModifyBehaviourCommand::ADD){
+          AddBehaviour(modify.entity, modify.flag);
+        }
+        else{
+          RemoveBehaviour(modify.entity, modify.flag);
+        }
+        break;
+      }
   }
   if(buffer->index > 0){
     if(buffer->allCommands[buffer->index - 1].command.timestamp == timestamp){
@@ -69,7 +116,7 @@ void Redo(CommandBuffer* buffer, LevelData* lvl){
     return;
   }
 
-  Execute(cmd, lvl, true);
+  Execute(cmd, lvl, buffer, true);
 
   buffer->index++;
 

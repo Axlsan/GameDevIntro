@@ -1,4 +1,6 @@
 #include "entity.h"
+#include "command.h"
+#include "levels.h"
 
 bool IsMoving(Entity* entity){
   return entity->x != entity->xPrev || entity->y != entity->yPrev;
@@ -28,7 +30,8 @@ void InitializeBaseBehaviour(Entity* entity){
       break;
       
     case ID::GOLEM:
-      SetBehaviour(entity, (Behaviour)(CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT));
+      SetBehaviour(entity, (Behaviour)(CAN_MOVE | IS_PLAYER | RESPOND_TO_INPUT | CAN_ROTATE));
+      AddBehaviour(entity, Behaviour::UNPUSHABLE);
       entity->strength = 999;
       break;
 
@@ -57,3 +60,43 @@ void RemoveBehaviour(Entity* entity, Behaviour flags){
 }
 
 
+void PostMove(Entity* entity, LevelData* lvl, CommandBuffer* commandBuffer){
+  if(entity->id == ID::MEDUSA){
+    Entity* entityLookedAt = RaycastFirstEntity(entity->x, entity->y, entity->facing, lvl);
+    if(entityLookedAt != nullptr){
+      if(!HasBehaviour(entityLookedAt, Behaviour::IS_PETRIFIED)){
+        ModifyBehaviourCommand modify(entityLookedAt, Behaviour::IS_PETRIFIED, ModifyBehaviourCommand::ADD);
+        Push(commandBuffer, modify, lvl);
+      }
+    }
+  }
+  
+}
+
+void PostRotation(Entity* entity, LevelData* lvl, CommandBuffer* commandBuffer, Direction from, Direction to){
+  if(from == to){
+    return;
+  }
+
+  if(entity->id == ID::MEDUSA){
+    Entity* entityLookedAt = RaycastFirstEntity(entity->x, entity->y, to, lvl);
+    if(!HasBehaviour(entityLookedAt, Behaviour::IS_PETRIFIED)){
+      ModifyBehaviourCommand modify(entityLookedAt, Behaviour::IS_PETRIFIED, ModifyBehaviourCommand::ADD);
+      Push(commandBuffer, modify, lvl);
+    }
+  }
+}
+
+void PreRotation(Entity* entity, LevelData* lvl, CommandBuffer* commandBuffer, Direction from, Direction to){
+  if(from == to){
+    return;
+  }
+  
+  if(entity->id == ID::MEDUSA){
+    Entity* entityPreviouslyLookedAt = RaycastFirstEntity(entity->x, entity->y, from, lvl);
+    if(entityPreviouslyLookedAt != nullptr){
+      ModifyBehaviourCommand modify(entityPreviouslyLookedAt, Behaviour::IS_PETRIFIED, ModifyBehaviourCommand::REMOVE);
+      Push(commandBuffer, modify, lvl);
+    }
+  }
+}

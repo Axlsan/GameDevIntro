@@ -15,6 +15,6 @@ bool KeyHeld(SDL_Scancode key, const bool* current, const bool* previous);
 bool KeyReleased(SDL_Scancode key, const bool* current, const bool* previous);
 */
 
-bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmdBuffer, int xDir, int yDir, int timestamp, int strength);
+bool TryMove(Entity* mover, LevelData* level, CommandBuffer* cmdBuffer, int xDir, int yDir, int strength);
 }
 

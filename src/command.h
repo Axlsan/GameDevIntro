@@ -7,7 +7,8 @@
 enum class CMD_TYPE : uint8_t{
   NONE = 0,
   MOVE = 1,
-  ROTATE = 2
+  ROTATE = 2,
+  MODIFY_BEHAVIOUR = 3
 };
 
 struct Command{
@@ -41,10 +42,29 @@ struct RotateCommand : Command{
   }
 };
 
+struct ModifyBehaviourCommand : Command{
+  enum Mode{
+    ADD,
+    REMOVE
+  };
+
+  Entity* entity;
+  Behaviour flag;
+  Mode mode;
+  ModifyBehaviourCommand(Entity* entity, Behaviour flag, Mode mode){
+    this->entity = entity;
+    this->flag = flag;
+    this->mode = mode;
+    type = CMD_TYPE::MODIFY_BEHAVIOUR;
+    
+  }
+};
+
 union AnyCommand{
   Command command;
   MoveCommand move;
   RotateCommand rotate;
+  ModifyBehaviourCommand modify;
 
   AnyCommand(MoveCommand mv){
     move = mv;
@@ -53,6 +73,10 @@ union AnyCommand{
   AnyCommand(RotateCommand ro){
     rotate = ro;
   }
+
+  AnyCommand(ModifyBehaviourCommand mod){
+    modify = mod;
+  }
 };
 
 struct CommandBuffer{
@@ -60,9 +84,11 @@ struct CommandBuffer{
   int capacity;
   int index;
   int head;
+
+  uint32_t timestamp;
 };
 
 
-void Push(CommandBuffer* buffer, AnyCommand cmd, LevelData* lvl, uint32_t timestamp);
+void Push(CommandBuffer* buffer, AnyCommand cmd, LevelData* lvl);
 void Undo(CommandBuffer* buffer);
 void Redo(CommandBuffer* buffer, LevelData* lvl);

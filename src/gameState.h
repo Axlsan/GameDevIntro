@@ -32,7 +32,7 @@ struct GameData {
 
   ImGuiContext* ImGUIContext;
 
-  uint32_t commandTimestamp;
+//  uint32_t commandTimestamp;
   
   Position* inputBuffer;
   int inputBufferCapacity;
