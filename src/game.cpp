@@ -104,10 +104,13 @@ extern "C" {
     if(HasBehaviour(stepIntoEntity, CAN_MOVE) && !HasBehaviour(stepIntoEntity, UNPUSHABLE)){
       if (TryMove(stepIntoEntity, level, cmdBuffer, xDir, yDir, --strength)) {
         MoveCommand mv(mover, xDir, yDir);
+        AddBehaviour(mover, Behaviour::IS_PUSHING);
+        /*
         mv.type = CMD_TYPE::MOVE;
         mv.entity = mover;
         mv.xDir = xDir;
         mv.yDir = yDir;
+        */
         Push(cmdBuffer, mv, level);
         return true;
       }
@@ -181,6 +184,10 @@ extern "C" {
 
       for(int i = 0; i < data->GetCurrentLevel()->entityCount; i++){
         Entity* entity = &data->GetCurrentLevel()->entityBuffer[i];
+        if(HasBehaviour(entity, Behaviour::IS_PUSHING)){
+          RemoveBehaviour(entity, Behaviour::IS_PUSHING);
+        }
+        
         if(HasBehaviour(entity, (Behaviour)(RESPOND_TO_INPUT | CAN_MOVE))){
           if(HasBehaviour(entity, Behaviour::IS_PETRIFIED)){
             continue;

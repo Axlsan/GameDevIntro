@@ -6,18 +6,23 @@
 #include "spriteLibrary.h"
 #include "SDL3/SDL_surface.h"
 #include "arena.h"
+#include "entity.h"
 using namespace std;
 
 const char* DIRECTORY = "assets/sprites/";
 const char* FALLBACK_PATH = "assets/sprites/dog.png";
 
 static const SpriteDataEntry allSpriteData[] = {
-  {SPRITE_ID::Fallback,  FALLBACK_PATH},
-  {SPRITE_ID::Wall,      "assets/sprites/wall.png"},
+  {SPRITE_ID::Fallback,  FALLBACK_PATH, 0, 0},
+  {SPRITE_ID::Wall,      "assets/sprites/wall.png", 0, 0},
   {SPRITE_ID::Demon,     "assets/sprites/player.png"},
-  {SPRITE_ID::Rock,      "assets/sprites/box.png"},
-  {SPRITE_ID::Ground,    "assets/sprites/ground.png"},
-  {SPRITE_ID::Medusa,    "assets/sprites/medusa.png"},
+  {SPRITE_ID::Rock,      "assets/sprites/box.png", 10, 20},
+  {SPRITE_ID::Ground,    "assets/sprites/ground.png", 0, 0},
+  {SPRITE_ID::GroundAlt, "assets/sprites/groundAlt.png", 0, 0},
+  {SPRITE_ID::MedusaIdleSide,   "assets/sprites/medusa.png", 12, 24},
+  {SPRITE_ID::MedusaIdleFront,  "assets/sprites/medusa.png", 12, 24},
+  {SPRITE_ID::MedusaIdleBack,   "assets/sprites/medusa.png", 12, 24},
+  {SPRITE_ID::DropShadow, "assets/sprites/medusa.png", 8, 8},
 };
 
 Sprite* GetSpriteFromID(ID id, Sprite* spriteBuffer){
@@ -41,7 +46,8 @@ Sprite* GetSpriteFromID(ID id, Sprite* spriteBuffer){
       spriteToReturn = &spriteBuffer[(int)SPRITE_ID::Rock];
       break;
     case ID::MEDUSA:
-      spriteToReturn = &spriteBuffer[(int)SPRITE_ID::Medusa];
+      spriteToReturn = nullptr;
+      //spriteToReturn = &spriteBuffer[(int)SPRITE_ID::Medusa];
       break;
     case ID::SIREN:
       spriteToReturn = &spriteBuffer[(int)SPRITE_ID::Siren];
@@ -61,6 +67,27 @@ Sprite* GetSpriteFromID(ID id, Sprite* spriteBuffer){
   return spriteToReturn;
 }
 
+Sprite* GetSpriteFromEntityState(Entity* entity, Sprite* spriteBuffer){
+  if(HasBehaviour(entity, Behaviour::IS_PETRIFIED)){
+    return &spriteBuffer[(int)SPRITE_ID::Rock];
+  }
+
+  switch(entity->id){
+    case ID::MEDUSA:
+      switch (entity->facing){
+        case Direction::RIGHT:
+        case Direction::LEFT:
+          return &spriteBuffer[(int)SPRITE_ID::MedusaIdleSide];
+        case Direction::DOWN:
+          return &spriteBuffer[(int)SPRITE_ID::MedusaIdleFront];
+        case Direction::UP:
+          return &spriteBuffer[(int)SPRITE_ID::MedusaIdleBack];
+      }
+      default:
+        return GetSpriteFromID(entity->id, spriteBuffer);
+  }
+  return nullptr;
+}
 
 namespace AssetManagement{
   void LoadAllSprites(Sprite *spriteBuffer, SDL_Renderer *renderer){
@@ -82,10 +109,21 @@ namespace AssetManagement{
     sprite->height = texture->h;
     sprite->width = texture->w;
 
+    if(entry.pivotX == NOT_SET || entry.pivotY == NOT_SET){
+      sprite->pivotX = sprite->width / 2;
+      sprite->pivotY = sprite->height / 2;
+    }
+    else{
+      sprite->pivotX = entry.pivotX;
+      sprite->pivotY = entry.pivotY;
+    }
+
     SDL_DestroySurface(surface);
+
+    
   }
   
-}  
+}
 
 /*
 Sprite* AssetManagement::LoadSprite(Memory::Arena* arena, SDL_Renderer* renderer, const char* name){
