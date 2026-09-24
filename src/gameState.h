@@ -56,5 +56,9 @@ struct GameData {
 
   bool editLevel;
   Editor editorData;
+
+  Memory::Arena* arenaScratch;
+
+  Memory::Arena* arenaMain;
 };
 
