@@ -6,7 +6,7 @@
 #include "imgui/imgui_internal.h"
 
 namespace DEV{
-  void Initialize(SDL_Window* window, SDL_Renderer* renderer);
+  void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer);
   void ProcessEvents(SDL_Event* event);
   void PreDraw(ImGuiContext* savedContext);
   void Draw(GameData* data, SDL_Renderer* renderer);

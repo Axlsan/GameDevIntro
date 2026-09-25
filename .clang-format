@@ -1,5 +1,4 @@
 ---
 Language: Cpp
 DerivePointerAlignment: false
-PointerAlignment: Right
-
+PointerAlignment: Left

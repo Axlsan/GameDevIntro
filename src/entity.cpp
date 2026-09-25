@@ -12,7 +12,7 @@ bool HasBehaviour(Entity* entity, Behaviour flags){
 }
 
 void InitializeBaseBehaviour(Entity* entity){
-  assert(entity->id != ID::NONE);
+  //assert(entity->id != ID::NONE);
     switch (entity->id) {
 
     default:

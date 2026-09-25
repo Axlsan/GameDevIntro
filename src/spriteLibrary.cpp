@@ -15,20 +15,20 @@ const char *FALLBACK_PATH = "assets/sprites/dog.png";
 static const SpriteDataEntry allSpriteData[] = {
     {SPRITE_ID::Fallback, FALLBACK_PATH, 16, 16},
     {SPRITE_ID::Wall, "assets/sprites/wall.png", 0, 0},
-    {SPRITE_ID::Demon, "assets/sprites/player.png", 8, 8},
+    {SPRITE_ID::Demon, "assets/sprites/player.png", 8, 16},
     {SPRITE_ID::Rock, "assets/sprites/box.png", 8, 8},
     //{SPRITE_ID::Rock,      "assets/sprites/box.png", 10, 20},
     {SPRITE_ID::Ground, "assets/sprites/ground.png", 0, 0},
     {SPRITE_ID::GroundAlt, "assets/sprites/groundAlt.png", 0, 0},
-    {SPRITE_ID::MedusaIdleSide, "assets/sprites/medusa.png", 12, 24},
-    {SPRITE_ID::MedusaIdleFront, "assets/sprites/medusa.png", 12, 24},
-    {SPRITE_ID::MedusaIdleBack, "assets/sprites/medusa.png", 12, 24},
+    {SPRITE_ID::MedusaIdleSide, "assets/sprites/medusa_idle_side.png", 12, 24},
+    {SPRITE_ID::MedusaIdleFront, "assets/sprites/medusa_idle_front.png", 12, 24},
+    {SPRITE_ID::MedusaIdleBack, "assets/sprites/medusa_idle_back.png", 12, 24},
     {SPRITE_ID::DropShadow, "assets/sprites/dropShadow.png", 8, 8},
 };
 
-Sprite *GetSpriteFromID(ID id, Sprite *spriteBuffer) {
+Sprite *GetSpriteFromID(ID id, Sprite* spriteBuffer) {
 
-  Sprite *spriteToReturn = nullptr;
+  Sprite* spriteToReturn = nullptr;
 
   switch (id) {
   case ID::NONE:
@@ -47,8 +47,8 @@ Sprite *GetSpriteFromID(ID id, Sprite *spriteBuffer) {
     spriteToReturn = &spriteBuffer[(int)SPRITE_ID::Rock];
     break;
   case ID::MEDUSA:
-    spriteToReturn = nullptr;
-    // spriteToReturn = &spriteBuffer[(int)SPRITE_ID::Medusa];
+    //spriteToReturn = nullptr;
+    spriteToReturn = &spriteBuffer[(int)SPRITE_ID::MedusaIdleFront];
     break;
   case ID::SIREN:
     spriteToReturn = &spriteBuffer[(int)SPRITE_ID::Siren];
@@ -68,7 +68,7 @@ Sprite *GetSpriteFromID(ID id, Sprite *spriteBuffer) {
   return spriteToReturn;
 }
 
-Sprite *GetSpriteFromEntityState(Entity *entity, Sprite *spriteBuffer) {
+Sprite *GetSpriteFromEntityState(Entity* entity, Sprite* spriteBuffer) {
   if (HasBehaviour(entity, Behaviour::IS_PETRIFIED)) {
     return &spriteBuffer[(int)SPRITE_ID::Rock];
   }
@@ -91,22 +91,23 @@ Sprite *GetSpriteFromEntityState(Entity *entity, Sprite *spriteBuffer) {
 }
 
 namespace AssetManagement {
-void LoadAllSprites(Sprite *spriteBuffer, SDL_Renderer *renderer) {
+void LoadAllSprites(Sprite* spriteBuffer, SDL_Renderer* renderer) {
   for (SpriteDataEntry entry : allSpriteData) {
     LoadSprite(spriteBuffer, entry, renderer);
   }
 }
 
-void LoadSprite(Sprite *spriteBuffer, SpriteDataEntry entry,
-                SDL_Renderer *renderer) {
-  SDL_Surface *surface = IMG_Load(entry.path);
+void LoadSprite(Sprite* spriteBuffer, SpriteDataEntry entry, SDL_Renderer* renderer) {
+  SDL_Surface* surface = IMG_Load(entry.path);
   if (surface == nullptr) {
     surface = IMG_Load(FALLBACK_PATH);
   }
   assert(surface != nullptr);
 
-  SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-  Sprite *sprite = &spriteBuffer[(int)entry.id];
+  SDL_Texture* texture = SDL_CreateTextureFromSurface(renderer, surface);
+  assert(texture != nullptr);
+  
+  Sprite* sprite = &spriteBuffer[(int)entry.id];
   sprite->texture = texture;
   sprite->height = texture->h;
   sprite->width = texture->w;

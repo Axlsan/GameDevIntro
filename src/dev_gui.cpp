@@ -11,7 +11,7 @@
 #include <string>
 
 using namespace std;
-void DEV::Initialize(SDL_Window* window, SDL_Renderer *renderer){
+void DEV::Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer){
   ImGui::CreateContext();
   ImGui_ImplSDL3_InitForSDLRenderer(window, renderer);
   ImGui_ImplSDLRenderer3_Init(renderer);
@@ -50,7 +50,7 @@ void DrawHistory(CommandBuffer* buffer, LevelData* lvl){
   int sliderPos = buffer->index;
   if(ImGui::SliderInt("history", &sliderPos, 0, buffer->head)){
     while(buffer->index > sliderPos){
-      Undo(buffer);
+      Undo(buffer, lvl);
     }
     while(buffer->index < sliderPos){
       Redo(buffer, lvl);

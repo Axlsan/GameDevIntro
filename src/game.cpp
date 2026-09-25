@@ -19,7 +19,7 @@
 extern "C" {
   void Initialize(GameData* data, SDL_Window* window, SDL_Renderer* renderer){
 //    printf("dll sizeof(GameData) = %zu\n", sizeof(GameData));
-    DEV::Initialize(window, renderer);
+    DEV::Initialize(data, window, renderer);
     data->ImGUIContext = ImGui::GetCurrentContext();
 
     /*
@@ -125,7 +125,7 @@ extern "C" {
       data->editLevel = !data->editLevel;
     }
     if(data->editLevel){
-      EDITOR::Update(&data->editorData, &data->input, data->GetCurrentLevel());
+      EDITOR::Update(&data->editorData, &data->input, data->GetCurrentLevel(), data->commandBuffer);
     }
 
     // UNDO/REDO
@@ -135,7 +135,7 @@ extern "C" {
         Redo(data->commandBuffer, data->GetCurrentLevel());
       }
       else{
-        Undo(data->commandBuffer);
+        Undo(data->commandBuffer, data->GetCurrentLevel());
       }
     }
 
