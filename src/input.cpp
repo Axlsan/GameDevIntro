@@ -3,6 +3,7 @@
 #include "input.h"
 #include "SDL3/SDL_mouse.h"
 #include "SDL3/SDL_scancode.h"
+#include "command.h"
 
 bool KeyPressed(const Input *input, SDL_Scancode key){
   if(input->keysPrevious == nullptr){
@@ -108,4 +109,13 @@ void UpdateMouse(Input* input, float dt){
   }
   
   input->mousePrevious = input->mouseCurrent;
+}
+
+bool AnyKeyPressed(const Input* input){
+  for(int i = 0; i < SDL_SCANCODE_COUNT; i++){
+    if(KeyPressed(input, (SDL_Scancode)i)){
+      return true;
+    }
+  }
+  return false;
 }

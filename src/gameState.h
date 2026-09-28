@@ -10,7 +10,72 @@
 #include "levels.h"
 #include "input.h"
 
+struct Gameplay{
+  CommandBuffer* commandBuffer;
+  LevelData* levels;
+  int levelCount;
+  int currentLevelIndex;
+  Position* inputBuffer;
+  int inputBufferCapacity;
+  int inputBufferWriteCount;
+  int inputBufferReadCount;
+  bool initialized;
+};
+
+struct MainMenu{
+  
+};
+
+struct TitleScreen{
+  
+};
+
+struct Credits{
+  
+};
+
+enum class SCENE_TYPES : uint8_t{
+  NONE,
+  TITLESCREEN,
+  MAINMENU,
+  GAME,
+  CREDITS
+};
+
+
+
+struct Scenes{
+  Gameplay gameplay;
+  MainMenu mainMenu;
+  TitleScreen titleScreen;
+  Credits credits;
+};
+
+struct Transition{
+ enum States{
+   Inactive,
+   FadeTo,
+   FadeFrom
+ };
+ States state;
+ float fadeTimeElapsed;
+ float fadeTimeDuration = 1;
+};
+
+struct EditorData{
+  bool editLevel;
+  Editor editor;
+  // CommandBuffer* commandBuffer;
+};
+
 struct GameData {
+
+  SCENE_TYPES sceneCurrent;
+  SCENE_TYPES scenePrevious;
+  Scenes scenes;
+  Transition transition;
+  EditorData editorData;
+  
   Sprite* fallback;
   Sprite* wall;
   Sprite* ground;
@@ -20,31 +85,29 @@ struct GameData {
   Memory::Arena* arenaEntities;
   Memory::Arena* arenaImages;
 
-  LevelData* levels;
-  int levelCount;
-  int currentLevelIndex;
+  //LevelData* levels;
+  //int levelCount;
+  //int currentLevelIndex;
 
   float moveSpeed;
 
-  //bool* keysPrevious;
 
   const float* dt;
 
   ImGuiContext* ImGUIContext;
 
-//  uint32_t commandTimestamp;
   
-  Position* inputBuffer;
-  int inputBufferCapacity;
-  int inputBufferWriteCount;
-  int inputBufferReadCount;
+  //Position* inputBuffer;
+  //int inputBufferCapacity;
+  //int inputBufferWriteCount;
+  //int inputBufferReadCount;
   
-  LevelData* GetCurrentLevel(){
-    return &levels[currentLevelIndex];
-  }
+  //LevelData* GetCurrentLevel(){
+  //  return &levels[currentLevelIndex];
+  //}
   
   Memory::Arena* arenaCommands;
-  CommandBuffer* commandBuffer;
+  // CommandBuffer* commandBuffer;
 
 
   Input input;
@@ -54,11 +117,14 @@ struct GameData {
 
   Sprite* spriteBuffer;
 
-  bool editLevel;
-  Editor editorData;
+  // bool editLevel;
+  // Editor editor;
 
   Memory::Arena* arenaScratch;
 
   Memory::Arena* arenaMain;
 };
 
+inline LevelData* GetCurrentLevel(Gameplay* game){
+  return &game->levels[game->currentLevelIndex];
+}

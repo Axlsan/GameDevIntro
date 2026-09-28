@@ -16,7 +16,7 @@ bool IsEntityBelowOtherEntity(Entity *a, Entity *b) { return a->y < b->y; }
 
 void RenderLevel(GameData *gameData, SDL_Renderer *renderer) {
 
-  LevelData lvlData = gameData->levels[gameData->currentLevelIndex];
+  LevelData lvlData = gameData->scenes.gameplay.levels[gameData->scenes.gameplay.currentLevelIndex];
 
   // int boardWidthPxHalf = lvlData.w * CELL_SIZE_PX / 2;
   // int boardHeightPxHalf = lvlData.h * CELL_SIZE_PX / 2;
@@ -45,7 +45,7 @@ void RenderLevel(GameData *gameData, SDL_Renderer *renderer) {
 }
 
 void RenderEntities(GameData *data, SDL_Renderer *renderer) {
-  LevelData *lvlData = &data->levels[data->currentLevelIndex];
+  LevelData *lvlData = &data->scenes.gameplay.levels[data->scenes.gameplay.currentLevelIndex];
 
   Entity **SortedEntities =
       ALLOC_ARRAY(data->arenaScratch, Entity *, lvlData->entityCount);

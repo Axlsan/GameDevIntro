@@ -93,16 +93,16 @@ void DEV::Draw(GameData* data, SDL_Renderer* renderer){
   DrawImGuiArenaUsage(data->arenaLevels, "levels");
   DrawImGuiArenaUsage(data->arenaCommands, "commands");
   DrawImGuiArenaUsage(data->arenaEntities, "entities");
-  DrawHistory(data->commandBuffer, data->GetCurrentLevel());
+  DrawHistory(data->scenes.gameplay.commandBuffer, GetCurrentLevel(&data->scenes.gameplay));
   DrawFPS(*data->dt);
 
   DrawColor();
   DrawSamples();
   DrawMouseClick(data);
 
-  if(data->editLevel){
-    EDITOR::DrawObjectPanel(&data->editorData, data->spriteBuffer);
-    EDITOR::DrawPreview(&data->editorData, &data->input, renderer, data->GetCurrentLevel(), &data->camera, data->spriteBuffer);
+  if(data->editorData.editLevel){
+    EDITOR::DrawObjectPanel(&data->editorData.editor, data->spriteBuffer);
+    EDITOR::DrawPreview(&data->editorData.editor, &data->input, renderer, GetCurrentLevel(&data->scenes.gameplay), &data->camera, data->spriteBuffer);
   }
   
   // END CODE

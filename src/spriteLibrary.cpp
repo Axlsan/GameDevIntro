@@ -24,7 +24,16 @@ static const SpriteDataEntry allSpriteData[] = {
     {SPRITE_ID::MedusaIdleFront, "assets/sprites/medusa_idle_front.png", 12, 24},
     {SPRITE_ID::MedusaIdleBack, "assets/sprites/medusa_idle_back.png", 12, 24},
     {SPRITE_ID::DropShadow, "assets/sprites/dropShadow.png", 8, 8},
+    {SPRITE_ID::black_1x1, "assets/sprites/black_1x1.png", 0, 0},
+    
+    {SPRITE_ID::Siren, "assets/sprites/siren.png", 0, 0},
+    {SPRITE_ID::Golem, "assets/sprites/golem.png", 0, 0},
+    {SPRITE_ID::titleScreenBackground, "assets/sprites/titlescreen.png", 0, 0},
 };
+
+Sprite* GetSprite(SPRITE_ID spriteID, Sprite* spriteBuffer){
+  return &spriteBuffer[(int)spriteID];
+}
 
 Sprite *GetSpriteFromID(ID id, Sprite* spriteBuffer) {
 

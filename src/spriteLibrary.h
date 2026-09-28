@@ -19,14 +19,19 @@ enum class SPRITE_ID{
   Wall,
   Rock,
   Demon,
-  Medusa,
+  // Medusa,
   MedusaIdleSide,
   MedusaIdleFront,
   MedusaIdleBack,
   Siren,
   Golem,
-  DropShadow
+  DropShadow,
+  titleScreenBackground,
+  black_1x1
 };
+
+Sprite* GetSprite(SPRITE_ID spriteID, Sprite* spriteBuffer);
+
 
 const int NOT_SET = -1;
 

@@ -175,25 +175,25 @@ int main() {
   gameData->arenaCommands = Memory::CreateSubArena(gameData->arenaLevels, MEGABYTES(1));
   
   // Levels
-  gameData->levelCount = 2; 
-  gameData->levels = ALLOC_ARRAY(gameData->arenaLevels, LevelData, gameData->levelCount);
+  gameData->scenes.gameplay.levelCount = 2; 
+  gameData->scenes.gameplay.levels = ALLOC_ARRAY(gameData->arenaLevels, LevelData, gameData->scenes.gameplay.levelCount);
   //gameData->levels = (LevelData*)Memory::Allocate(gameData->arenaLevels, sizeof(LevelData) * gameData->levelCount);
 
 
 //  gameData->input.keysPrevious = (bool*)Memory::Allocate(gameData->arenaLevels, sizeof(bool) * SDL_SCANCODE_COUNT);
 
   //Commandbuffer
-  gameData->commandBuffer = ALLOC(arenaMain, CommandBuffer);
+  gameData->scenes.gameplay.commandBuffer = ALLOC(arenaMain, CommandBuffer);
   //gameData->commandBuffer = (CommandBuffer*)Memory::Allocate(gameData->arenaLevels, sizeof(CommandBuffer));
-  gameData->commandBuffer->capacity = 2000;
-  size_t COMMAND_SIZE = sizeof(AnyCommand) * gameData->commandBuffer->capacity;
-  gameData->commandBuffer->allCommands = ALLOC_ARRAY(gameData->arenaCommands, AnyCommand, gameData->commandBuffer->capacity);
+    gameData->scenes.gameplay.commandBuffer->capacity = 2000;
+    size_t COMMAND_SIZE = sizeof(AnyCommand) * gameData->scenes.gameplay.commandBuffer->capacity;
+    gameData->scenes.gameplay.commandBuffer->allCommands = ALLOC_ARRAY(gameData->arenaCommands, AnyCommand, gameData->scenes.gameplay.commandBuffer->capacity);
   //gameData->commandBuffer->allCommands = (AnyCommand*)Memory::Allocate(gameData->arenaCommands, COMMAND_SIZE);
   
   // Ringbuffer
-  gameData->inputBufferCapacity = 50;
-  size_t RING_BUFFER_SIZE = sizeof(Position) * gameData->inputBufferCapacity;
-  gameData->inputBuffer = ALLOC_ARRAY(gameData->arenaLevels, Position, gameData->inputBufferCapacity);
+  gameData->scenes.gameplay.inputBufferCapacity = 50;
+  size_t RING_BUFFER_SIZE = sizeof(Position) * gameData->scenes.gameplay.inputBufferCapacity;
+  gameData->scenes.gameplay.inputBuffer = ALLOC_ARRAY(gameData->arenaLevels, Position, gameData->scenes.gameplay.commandBuffer->capacity);
   //gameData->inputBuffer = (Position*)Memory::Allocate(gameData->arenaLevels, RING_BUFFER_SIZE);
 
   // Input arena
